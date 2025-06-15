@@ -26,7 +26,7 @@ Designed for mobile-first use, myGarageSale is fast to load, simple to navigate,
 
 ---
 
-## 🧠 Future Additions
+## Future Additions
 
 - Email receipt or SMS alert on purchase  
 - Dark mode theme  
@@ -35,7 +35,7 @@ Designed for mobile-first use, myGarageSale is fast to load, simple to navigate,
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - [React](https://react.dev/) + [Vite](https://vitejs.dev/)
 - HTML5 / CSS3 / JavaScript (ES6+)
@@ -45,7 +45,7 @@ Designed for mobile-first use, myGarageSale is fast to load, simple to navigate,
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ```bash
 git clone https://github.com/yourusername/myGarageSale.git

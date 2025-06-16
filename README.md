@@ -52,6 +52,7 @@ git clone https://github.com/yourusername/myGarageSale.git
 cd myGarageSale
 npm install
 npm run dev
+```
 
 ---
 

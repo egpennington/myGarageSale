@@ -6,8 +6,23 @@ function ItemForm() {
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState('draft')
 
+  function handleSubmit(e) {
+    e.preventDefault()
+
+    const newItem = {
+      id: Date.now(),
+      title,
+      price: Number(price),
+      description,
+      status,
+      image: '',
+    }
+
+    console.log(newItem)
+  }
+
   return (
-    <form className="item-form">
+    <form className="item-form" onSubmit={handleSubmit}>
       <h2><i className="fa-solid fa-list-check"></i> Add New Listing</h2>
 
       <label>

@@ -1,4 +1,4 @@
-import sampleItems from '../data/starterItems'
+import sampleItems from '../data/sampleItems'
 import ItemCard from '../components/ItemCard'
 
 function Store() {

@@ -8,7 +8,7 @@ function Header() {
       <nav>
         <Link to="/"><i className="fa-solid fa-house"></i> Home</Link>
         <Link to="/store"><i className="fa-solid fa-shop"></i> Store</Link>
-        <Link to="/admin"><i class="fa-solid fa-unlock"></i> Admin</Link>
+        <Link to="/admin"><i className="fa-solid fa-unlock"></i> Admin</Link>
       </nav>
     </header>
   )

@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-function ItemForm() {
+function ItemForm({ setItems }) {
   const [title, setTitle] = useState('')
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
@@ -8,6 +8,11 @@ function ItemForm() {
 
   function handleSubmit(e) {
     e.preventDefault()
+
+    if (!title || !price || !description) {
+      alert('Please fill out the title, price, and description.')
+      return
+    }
 
     const newItem = {
       id: Date.now(),
@@ -18,7 +23,12 @@ function ItemForm() {
       image: '',
     }
 
-    console.log(newItem)
+    setItems((currentItems) => [...currentItems, newItem])
+
+    setTitle('')
+    setPrice('')
+    setDescription('')
+    setStatus('draft')
   }
 
   return (

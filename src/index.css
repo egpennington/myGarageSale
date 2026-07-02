@@ -192,3 +192,20 @@ footer {
 .danger-button:hover {
   background: #b91c1c;
 }
+
+/* Admin card */
+.admin-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.admin-item h2 {
+  margin-bottom: 0.25rem;
+}
+
+.admin-actions {
+  margin-top: 1rem;
+}

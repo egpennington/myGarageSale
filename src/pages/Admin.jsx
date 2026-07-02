@@ -1,5 +1,5 @@
 import sampleItems from '../data/sampleItems'
-import ItemCard from '../components/ItemCard'
+import AdminItem from '../components/AdminItem'
 
 function Admin() {
   return (
@@ -9,18 +9,7 @@ function Admin() {
 
       <div className="admin-list">
         {sampleItems.map((item) => (
-          <div className="admin-item" key={item.id}>
-            <ItemCard item={item} />
-
-            <div className="admin-actions">
-              <button>Edit</button>
-              <button>
-                {item.status === 'published' ? 'Unpublish' : 'Publish'}
-              </button>
-              <button>Mark Sold</button>
-              <button className="danger-button">Delete</button>
-            </div>
-          </div>
+          <AdminItem key={item.id} item={item} />
         ))}
       </div>
     </section>

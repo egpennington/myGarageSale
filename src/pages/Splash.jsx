@@ -1,4 +1,4 @@
-function Spash() {
+function Splash() {
     return <h1>Splash Page Here</h1>
 }
 

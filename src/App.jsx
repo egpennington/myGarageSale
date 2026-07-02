@@ -1,5 +1,5 @@
-// import React from 'react'
-// don't need since used vite setup, unless i use useState()
+// React import isn't needed with the Vite/modern JSX transform
+// unless importing something like useState or useEffect.
 
 function App() {
   return (

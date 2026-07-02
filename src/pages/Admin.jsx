@@ -10,6 +10,7 @@ function Admin() {
 
       <ItemForm />
 
+      <h2 className="section-title"><i className="fa-solid fa-list"></i> Current Listings</h2>
       <div className="admin-list">
         {sampleItems.map((item) => (
           <AdminItem key={item.id} item={item} />

@@ -1,10 +1,12 @@
+import { formatCurrency } from '../utils/formatCurrency'
+
 function AdminItem({ item }) {
   return (
     <article className="admin-item">
       <div>
         <h2>{item.title}</h2>
         <p>{item.description}</p>
-        <strong>${item.price}</strong>
+        <strong>{formatCurrency(item.price)}</strong>
         <p>Status: {item.status}</p>
       </div>
 

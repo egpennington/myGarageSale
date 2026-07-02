@@ -23,9 +23,13 @@ function ItemForm() {
         <textarea placeholder="Good condition. Comes with battery and charger." />
       </label>
 
-      <label className="checkbox-row">
-        <input type="checkbox" />
-        Publish immediately
+      <label>
+            Status
+            <select defaultValue="draft">
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="sold">Sold</option>
+            </select>
       </label>
 
       <button type="submit">Save Listing</button>

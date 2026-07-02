@@ -1,3 +1,5 @@
+import { formatCurrency } from '../utils/formatCurrency'
+
 function ItemCard({ item }) {
   return (
     <article className="item-card">
@@ -8,7 +10,7 @@ function ItemCard({ item }) {
       <div className="item-card__body">
         <h2>{item.title}</h2>
         <p>{item.description}</p>
-        <strong>${item.price}</strong>
+        <strong>{formatCurrency(item.price)}</strong>
 
         {item.status === 'sold' && <span className="sold-badge">Sold</span>}
       </div>

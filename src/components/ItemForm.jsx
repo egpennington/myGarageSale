@@ -1,4 +1,11 @@
+import { useState } from "react"
+
 function ItemForm() {
+  const [title, setTitle] = useState('')
+  const [price, setPrice] = useState('')
+  const [description, setDescription] = useState('')
+  const [status, setStatus] = useState('draft')
+
   return (
     <form className="item-form">
       <h2><i className="fa-solid fa-list-check"></i> Add New Listing</h2>
@@ -10,22 +17,39 @@ function ItemForm() {
 
       <label>
         Title
-        <input type="text" placeholder="Cordless drill" />
+        <input
+          type="text"
+          placeholder="Cordless drill"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
       </label>
 
       <label>
         Price
-        <input type="number" placeholder="45" />
+        <input
+          type="number"
+          placeholder="45"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
       </label>
 
       <label>
         Description
-        <textarea placeholder="Good condition. Comes with battery and charger." />
+        <textarea
+          placeholder="Good condition. Comes with battery and charger."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
       </label>
 
       <label>
             Status
-            <select defaultValue="draft">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
                 <option value="sold">Sold</option>

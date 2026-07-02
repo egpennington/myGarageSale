@@ -1,30 +1,11 @@
-import { useState } from 'react'
-import './App.css'
+// import React from 'react'
+// don't need since used vite setup, unless i use useState()
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <section id="center">
-        
-        <div>
-          <h1>myGarageSale</h1>
-          <p>
-            A light weight ecommerce app
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <h1>myGarageSale</h1>
+      <p>Turn your garage into a tiny online store.</p>
     </>
   )
 }

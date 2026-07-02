@@ -209,3 +209,39 @@ footer {
 .admin-actions {
   margin-top: 1rem;
 }
+
+/* Item Form styles */
+.item-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  margin: 2rem 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.item-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.item-form input,
+.item-form textarea {
+  padding: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.item-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.checkbox-row {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem !important;
+}

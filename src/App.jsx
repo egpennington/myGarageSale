@@ -10,6 +10,12 @@ import sampleItems from './data/sampleItems'
 function App() {
   const [items, setItems] = useState(sampleItems)
 
+  function handleDelete(id) {
+    setItems((currentItems) =>
+      currentItems.filter((item) => item.id !== id)
+    )
+  }
+
   return (
     <Layout>
       <Routes>
@@ -26,6 +32,7 @@ function App() {
             <Admin
               items={items}
               setItems={setItems}
+              handleDelete={handleDelete}
             />
           }
         />

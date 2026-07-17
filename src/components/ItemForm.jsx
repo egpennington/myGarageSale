@@ -1,10 +1,20 @@
-import { useState } from "react"
+import { useEffect, useState } from 'react'
 
-function ItemForm({ setItems }) {
+function ItemForm({ setItems, editingItem, setEditingItem,
+  handleUpdateItem, }) {
   const [title, setTitle] = useState('')
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState('draft')
+
+  useEffect(() => {
+    if (editingItem) {
+      setTitle(editingItem.title)
+      setPrice(editingItem.price)
+      setDescription(editingItem.description)
+      setStatus(editingItem.status)
+    }
+  }, [editingItem])
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -14,16 +24,28 @@ function ItemForm({ setItems }) {
       return
     }
 
-    const newItem = {
-      id: Date.now(),
-      title,
-      price: Number(price),
-      description,
-      status,
-      image: '',
-    }
+    if (editingItem) {
+      const updatedItem = {
+        ...editingItem,
+        title,
+        price: Number(price),
+        description,
+        status,
+      }
 
-    setItems((currentItems) => [...currentItems, newItem])
+      handleUpdateItem(updatedItem)
+    } else {
+      const newItem = {
+        id: Date.now(),
+        title,
+        price: Number(price),
+        description,
+        status,
+        image: '',
+      }
+
+      setItems((currentItems) => [...currentItems, newItem])
+    }
 
     setTitle('')
     setPrice('')
@@ -33,7 +55,9 @@ function ItemForm({ setItems }) {
 
   return (
     <form className="item-form" onSubmit={handleSubmit}>
-      <h2><i className="fa-solid fa-list-check"></i> Add New Listing</h2>
+      <h2><i className="fa-solid fa-list-check"></i>
+        {editingItem ? ' Edit Listing' : ' Add New Listing'}
+      </h2>
 
       <label>
         Photo
@@ -81,7 +105,24 @@ function ItemForm({ setItems }) {
             </select>
       </label>
 
-      <button type="submit">Save Listing</button>
+      <button type="submit">
+        {editingItem ? 'Save Changes' : 'Add Listing'}
+      </button>
+
+      {editingItem && (
+        <button
+          type="button"
+          onClick={() => {
+            setEditingItem(null)
+            setTitle('')
+            setPrice('')
+            setDescription('')
+            setStatus('draft')
+          }}
+        >
+          Cancel Edit
+        </button>
+      )}
     </form>
   )
 }

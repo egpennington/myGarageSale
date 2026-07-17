@@ -76,6 +76,8 @@ function App() {
               handleDelete={handleDelete}
               handleTogglePublish={handleTogglePublish}
               handleToggleSold={handleToggleSold}
+               editingItem={editingItem}
+               setEditingItem={setEditingItem}
               handleUpdateItem={handleUpdateItem}
             />
           }

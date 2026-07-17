@@ -1,6 +1,6 @@
 import { formatCurrency } from '../utils/formatCurrency'
 
-function AdminItem({ item, handleDelete }) {
+function AdminItem({ item, handleDelete, handleTogglePublish, }) {
   return (
     <article className="admin-item">
       <div>
@@ -12,7 +12,9 @@ function AdminItem({ item, handleDelete }) {
 
       <div className="admin-actions">
         <button>Edit</button>
-        <button>{item.status === 'published' ? 'Unpublish' : 'Publish'}</button>
+        <button onClick={() => handleTogglePublish(item.id)}>
+          {item.status === 'published' ? 'Unpublish' : 'Publish'}
+        </button>
         <button>Mark Sold</button>
         <button
           className="danger-button"

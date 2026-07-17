@@ -16,6 +16,21 @@ function App() {
     )
   }
 
+  function handleTogglePublish(id) {
+    setItems((currentItems) =>
+      currentItems.map((item) => {
+        if (item.id !== id) {
+          return item
+        }
+
+        return {
+          ...item,
+          status: item.status === 'published' ? 'draft' : 'published',
+        }
+      })
+    )
+  }
+
   return (
     <Layout>
       <Routes>
@@ -33,6 +48,7 @@ function App() {
               items={items}
               setItems={setItems}
               handleDelete={handleDelete}
+              handleTogglePublish={handleTogglePublish}
             />
           }
         />

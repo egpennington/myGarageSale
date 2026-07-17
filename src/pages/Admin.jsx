@@ -2,7 +2,7 @@
 import AdminItem from '../components/AdminItem'
 import ItemForm from '../components/ItemForm'
 
-function Admin({ items, setItems, handleDelete }) {
+function Admin({ items, setItems, handleDelete, handleTogglePublish, }) {
   return (
     <section>
       <h1>Admin Page</h1>
@@ -14,7 +14,7 @@ function Admin({ items, setItems, handleDelete }) {
 
       <div className="admin-list">
         {items.map((item) => (
-          <AdminItem key={item.id} item={item} handleDelete={handleDelete} />
+          <AdminItem key={item.id} item={item} handleDelete={handleDelete} handleTogglePublish={handleTogglePublish} />
         ))}
       </div>
     </section>

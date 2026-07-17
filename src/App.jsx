@@ -9,6 +9,7 @@ import sampleItems from './data/sampleItems'
 
 function App() {
   const [items, setItems] = useState(sampleItems)
+  const [editingItem, setEditingItem] = useState(null)
 
   function handleDelete(id) {
     setItems((currentItems) =>
@@ -32,19 +33,29 @@ function App() {
   }
 
   function handleToggleSold(id) {
-  setItems((currentItems) =>
-    currentItems.map((item) => {
-      if (item.id !== id) {
-        return item
-      }
+    setItems((currentItems) =>
+      currentItems.map((item) => {
+        if (item.id !== id) {
+          return item
+        }
 
-      return {
-        ...item,
-        status: item.status === 'sold' ? 'published' : 'sold',
-      }
-    })
-  )
-}
+        return {
+          ...item,
+          status: item.status === 'sold' ? 'published' : 'sold',
+        }
+      })
+    )
+  }
+
+  function handleUpdateItem(updatedItem) {
+    setItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === updatedItem.id ? updatedItem : item
+      )
+    )
+
+    setEditingItem(null)
+  }
 
   return (
     <Layout>
@@ -65,6 +76,7 @@ function App() {
               handleDelete={handleDelete}
               handleTogglePublish={handleTogglePublish}
               handleToggleSold={handleToggleSold}
+              handleUpdateItem={handleUpdateItem}
             />
           }
         />

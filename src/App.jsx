@@ -31,6 +31,21 @@ function App() {
     )
   }
 
+  function handleToggleSold(id) {
+  setItems((currentItems) =>
+    currentItems.map((item) => {
+      if (item.id !== id) {
+        return item
+      }
+
+      return {
+        ...item,
+        status: item.status === 'sold' ? 'published' : 'sold',
+      }
+    })
+  )
+}
+
   return (
     <Layout>
       <Routes>
@@ -49,6 +64,7 @@ function App() {
               setItems={setItems}
               handleDelete={handleDelete}
               handleTogglePublish={handleTogglePublish}
+              handleToggleSold={handleToggleSold}
             />
           }
         />

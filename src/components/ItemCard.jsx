@@ -4,7 +4,11 @@ function ItemCard({ item }) {
   return (
     <article className="item-card">
       <div className="item-card__image">
-        {item.image ? <img src={item.image} alt={item.title} /> : <span>No photo</span>}
+        {item.image ? (
+          <img src={item.image} alt={item.title} />
+        ) : (
+          <span>No photo</span>
+        )}
       </div>
 
       <div className="item-card__body">

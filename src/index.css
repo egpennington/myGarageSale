@@ -135,9 +135,11 @@ button:hover {
 }
 
 .item-card__image {
-  height: 180px;
-  display: grid;
-  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: #e5e7eb;
   color: var(--text-light);
 }
@@ -354,4 +356,33 @@ footer {
   margin: 0 auto;
   color: var(--text-light);
   font-size: 1.1rem;
+}
+
+/* ITEM card img display */
+.item-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-preview {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.image-preview img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.image-preview button {
+  justify-self: start;
+  background: var(--text-light);
+}
+
+.image-preview button:hover {
+  background: var(--text);
 }

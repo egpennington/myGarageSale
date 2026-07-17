@@ -6,6 +6,7 @@ function ItemForm({ setItems, editingItem, setEditingItem,
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState('draft')
+  const [image, setImage] = useState('')
 
   useEffect(() => {
     if (editingItem) {
@@ -13,8 +14,30 @@ function ItemForm({ setItems, editingItem, setEditingItem,
       setPrice(editingItem.price)
       setDescription(editingItem.description)
       setStatus(editingItem.status)
+      setImage(editingItem.image || '')
     }
   }, [editingItem])
+
+  function handleImageChange(e) {
+    const file = e.target.files[0]
+
+    if (!file) {
+      return
+    }
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please choose an image file.')
+      return
+    }
+
+    const reader = new FileReader()
+
+    reader.onload = () => {
+      setImage(reader.result)
+    }
+
+    reader.readAsDataURL(file)
+  }
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -31,6 +54,7 @@ function ItemForm({ setItems, editingItem, setEditingItem,
         price: Number(price),
         description,
         status,
+        image,
       }
 
       handleUpdateItem(updatedItem)
@@ -41,7 +65,7 @@ function ItemForm({ setItems, editingItem, setEditingItem,
         price: Number(price),
         description,
         status,
-        image: '',
+        image,
       }
 
       setItems((currentItems) => [...currentItems, newItem])
@@ -51,6 +75,7 @@ function ItemForm({ setItems, editingItem, setEditingItem,
     setPrice('')
     setDescription('')
     setStatus('draft')
+    setImage('')
   }
 
   return (
@@ -61,7 +86,23 @@ function ItemForm({ setItems, editingItem, setEditingItem,
 
       <label>
         Photo
-        <input type="file" accept="image/*" />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
+        {image && (
+          <div className="image-preview">
+            <img src={image} alt="Listing preview" />
+
+            <button
+              type="button"
+              onClick={() => setImage('')}
+            >
+              Remove Photo
+            </button>
+          </div>
+        )}
       </label>
 
       <label>

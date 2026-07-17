@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import AdminItem from '../components/AdminItem'
 import ItemForm from '../components/ItemForm'
 
@@ -11,17 +12,30 @@ function Admin({
   setEditingItem,
   handleUpdateItem,
 }) {
+  const formRef = useRef(null)
+
+  function handleEdit(item) {
+    setEditingItem(item)
+
+    formRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
+
   return (
     <section>
       <h1>Admin Page</h1>
       <p>Manage your garage sale listings.</p>
 
-      <ItemForm
-        setItems={setItems}
-        editingItem={editingItem}
-        setEditingItem={setEditingItem}
-        handleUpdateItem={handleUpdateItem}
-      />
+      <div ref={formRef}>
+        <ItemForm
+          setItems={setItems}
+          editingItem={editingItem}
+          setEditingItem={setEditingItem}
+          handleUpdateItem={handleUpdateItem}
+        />
+      </div>
 
       <h2 className="section-title">Current Listings</h2>
 
@@ -33,7 +47,7 @@ function Admin({
             handleDelete={handleDelete}
             handleTogglePublish={handleTogglePublish}
             handleToggleSold={handleToggleSold}
-            setEditingItem={setEditingItem}
+            handleEdit={handleEdit}
           />
         ))}
       </div>

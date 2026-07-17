@@ -1,6 +1,6 @@
 import { formatCurrency } from '../utils/formatCurrency'
 
-function AdminItem({ item, handleDelete, handleTogglePublish, handleToggleSold, setEditingItem, }) {
+function AdminItem({ item, handleDelete, handleTogglePublish, handleToggleSold,   handleEdit, }) {
   return (
     <article className="admin-item">
       <div>
@@ -11,7 +11,7 @@ function AdminItem({ item, handleDelete, handleTogglePublish, handleToggleSold, 
       </div>
 
       <div className="admin-actions">
-        <button onClick={() => setEditingItem(item)}>
+        <button onClick={() => handleEdit(item)}>
           Edit
         </button>
         <button onClick={() => handleTogglePublish(item.id)}>

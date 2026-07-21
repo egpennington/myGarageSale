@@ -5,6 +5,7 @@ import ItemForm from '../components/ItemForm'
 function Admin({
   items,
   setItems,
+  handleAddItem,
   handleDelete,
   handleTogglePublish,
   handleToggleSold,
@@ -31,6 +32,7 @@ function Admin({
       <div ref={formRef}>
         <ItemForm
           setItems={setItems}
+          handleAddItem={handleAddItem}
           editingItem={editingItem}
           setEditingItem={setEditingItem}
           handleUpdateItem={handleUpdateItem}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-function ItemForm({ setItems, editingItem, setEditingItem,
+function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
   handleUpdateItem, }) {
   const [title, setTitle] = useState('')
   const [price, setPrice] = useState('')
@@ -39,7 +39,7 @@ function ItemForm({ setItems, editingItem, setEditingItem,
     reader.readAsDataURL(file)
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
 
     if (!title || !price || !description) {
@@ -60,7 +60,6 @@ function ItemForm({ setItems, editingItem, setEditingItem,
       handleUpdateItem(updatedItem)
     } else {
       const newItem = {
-        id: Date.now(),
         title,
         price: Number(price),
         description,
@@ -68,7 +67,7 @@ function ItemForm({ setItems, editingItem, setEditingItem,
         image,
       }
 
-      setItems((currentItems) => [...currentItems, newItem])
+      await handleAddItem(newItem)
     }
 
     setTitle('')

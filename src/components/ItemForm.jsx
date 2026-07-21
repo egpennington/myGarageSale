@@ -57,7 +57,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
         image,
       }
 
-      handleUpdateItem(updatedItem)
+      await handleUpdateItem(updatedItem)
     } else {
       const newItem = {
         title,

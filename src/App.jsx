@@ -4,7 +4,10 @@ import { Routes, Route } from 'react-router-dom'
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   getDocs,
+  updateDoc,
 } from 'firebase/firestore'
 
 import Layout from './components/Layout'
@@ -60,50 +63,110 @@ function App() {
     }
   }
 
-  function handleDelete(id) {
-    setItems((currentItems) =>
-      currentItems.filter((item) => item.id !== id)
-    )
-  }
+  async function handleDelete(id) {
+    try {
+      await deleteDoc(doc(db, 'items', id))
 
-  function handleTogglePublish(id) {
-    setItems((currentItems) =>
-      currentItems.map((item) => {
-        if (item.id !== id) {
-          return item
-        }
-
-        return {
-          ...item,
-          status: item.status === 'published' ? 'draft' : 'published',
-        }
-      })
-    )
-  }
-
-  function handleToggleSold(id) {
-    setItems((currentItems) =>
-      currentItems.map((item) => {
-        if (item.id !== id) {
-          return item
-        }
-
-        return {
-          ...item,
-          status: item.status === 'sold' ? 'published' : 'sold',
-        }
-      })
-    )
-  }
-
-  function handleUpdateItem(updatedItem) {
-    setItems((currentItems) =>
-      currentItems.map((item) =>
-        item.id === updatedItem.id ? updatedItem : item
+      setItems((currentItems) =>
+        currentItems.filter((item) => item.id !== id)
       )
-    )
 
-    setEditingItem(null)
+      if (editingItem?.id === id) {
+        setEditingItem(null)
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error)
+      alert('The listing could not be deleted.')
+    }
+  }
+
+  async function handleTogglePublish(id) {
+    const currentItem = items.find((item) => item.id === id)
+
+    if (!currentItem) {
+      return
+    }
+
+    const newStatus =
+      currentItem.status === 'published'
+        ? 'draft'
+        : 'published'
+
+    try {
+      await updateDoc(doc(db, 'items', id), {
+        status: newStatus,
+      })
+
+      setItems((currentItems) =>
+        currentItems.map((item) =>
+          item.id === id
+            ? { ...item, status: newStatus }
+            : item
+        )
+      )
+    } catch (error) {
+      console.error('Error changing publish status:', error)
+      alert('The listing status could not be changed.')
+    }
+  }
+
+  async function handleToggleSold(id) {
+    const currentItem = items.find((item) => item.id === id)
+
+    if (!currentItem) {
+      return
+    }
+
+    const newStatus =
+      currentItem.status === 'sold'
+        ? 'published'
+        : 'sold'
+
+    try {
+      await updateDoc(doc(db, 'items', id), {
+        status: newStatus,
+      })
+
+      setItems((currentItems) =>
+        currentItems.map((item) =>
+          item.id === id
+            ? { ...item, status: newStatus }
+            : item
+        )
+      )
+    } catch (error) {
+      console.error('Error changing sold status:', error)
+      alert('The sold status could not be changed.')
+    }
+  }
+
+  async function handleUpdateItem(updatedItem) {
+    try {
+      const itemRef = doc(db, 'items', updatedItem.id)
+
+      const itemData = {
+        title: updatedItem.title,
+        price: updatedItem.price,
+        description: updatedItem.description,
+        status: updatedItem.status,
+        image: updatedItem.image,
+      }
+
+      await updateDoc(itemRef, itemData)
+
+      setItems((currentItems) =>
+        currentItems.map((item) =>
+          item.id === updatedItem.id
+            ? updatedItem
+            : item
+        )
+      )
+
+      setEditingItem(null)
+    } catch (error) {
+      console.error('Error updating item:', error)
+      alert('The listing could not be updated.')
+    }
   }
 
   return (

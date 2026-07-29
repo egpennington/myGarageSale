@@ -1,27 +1,40 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Navigate, Routes, Route } from 'react-router-dom'
 // import { collection, getDocs } from 'firebase/firestore'
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  updateDoc,
-} from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc,} from 'firebase/firestore'
+import { onAuthStateChanged } from 'firebase/auth'
 
 import Layout from './components/Layout'
 import Splash from './pages/Splash'
 import Store from './pages/Store'
 import Admin from './pages/Admin'
-import { db } from './firebase/firebase'
+import Login from './pages/Login'
+
+import { auth, db } from './firebase/firebase'
+
 // import sampleItems from './data/sampleItems'
 
 function App() {
   // const [items, setItems] = useState(sampleItems)
   const [items, setItems] = useState([])
   const [editingItem, setEditingItem] = useState(null)
+  const [user, setUser] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
 
+  // watch auth
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (currentUser) => {
+        setUser(currentUser)
+        setAuthLoading(false)
+      }
+    )
+
+    return unsubscribe
+  }, [])
+
+  // loads firestore listings
   useEffect(() => {
     async function loadItems() {
       try {
@@ -170,7 +183,7 @@ function App() {
   }
 
   return (
-    <Layout>
+    <Layout user={user}>
       <Routes>
         <Route path="/" element={<Splash />} />
 
@@ -180,19 +193,30 @@ function App() {
         />
 
         <Route
+          path="/login"
+          element={<Login user={user} />}
+        />
+
+        <Route
           path="/admin"
           element={
-            <Admin
-              items={items}
-              setItems={setItems}
-              handleAddItem={handleAddItem}
-              handleDelete={handleDelete}
-              handleTogglePublish={handleTogglePublish}
-              handleToggleSold={handleToggleSold}
-              editingItem={editingItem}
-              setEditingItem={setEditingItem}
-              handleUpdateItem={handleUpdateItem}
-            />
+            authLoading ? (
+              <p>Checking authentication...</p>
+            ) : user ? (
+              <Admin
+                items={items}
+                setItems={setItems}
+                handleAddItem={handleAddItem}
+                handleDelete={handleDelete}
+                handleTogglePublish={handleTogglePublish}
+                handleToggleSold={handleToggleSold}
+                editingItem={editingItem}
+                setEditingItem={setEditingItem}
+                handleUpdateItem={handleUpdateItem}
+              />
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
       </Routes>

@@ -477,3 +477,10 @@ footer {
   border-radius: 6px;
   font-size: 0.9rem;
 }
+
+.login-page {
+    min-height: calc(100vh - 180px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

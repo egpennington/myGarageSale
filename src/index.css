@@ -386,3 +386,94 @@ footer {
 .image-preview button:hover {
   background: var(--text);
 }
+
+.nav-button {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Log in page */
+.login-page {
+    display: flex;
+    justify-content: center;
+    margin-top: 4rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+
+    background: white;
+    padding: 2rem;
+
+    border-radius: 12px;
+
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.login-card label {
+    font-weight: 600;
+}
+
+.login-card input {
+    padding: .75rem;
+
+    font-size: 1rem;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.login-card button {
+    margin-top: 1rem;
+
+    padding: .85rem;
+
+    font-size: 1rem;
+
+    border: none;
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+.nav-button:hover {
+  text-decoration: underline;
+}
+
+/* Footer page */
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-login-link {
+  font-size: 0.85rem;
+}
+
+.error-message {
+  margin: 0;
+  padding: 0.75rem;
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}

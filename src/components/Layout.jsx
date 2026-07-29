@@ -1,12 +1,12 @@
 import Header from './Header'
 import Footer from './Footer'
 
-function Layout({ children }) {
+function Layout({ children, user }) {
   return (
     <main className="container">
-      <Header />
+      <Header user={user} />
       <main>{children}</main>
-      <Footer />
+      <Footer user={user} />
     </main>
   )
 }

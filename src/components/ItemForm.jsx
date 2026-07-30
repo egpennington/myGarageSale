@@ -7,6 +7,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState('draft')
   const [image, setImage] = useState('')
+  const [imageFile, setImageFile] = useState(null)
 
   useEffect(() => {
     if (editingItem) {
@@ -15,6 +16,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
       setDescription(editingItem.description)
       setStatus(editingItem.status)
       setImage(editingItem.image || '')
+      setImageFile(null)
     }
   }, [editingItem])
 
@@ -30,13 +32,10 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
       return
     }
 
-    const reader = new FileReader()
+    setImageFile(file)
 
-    reader.onload = () => {
-      setImage(reader.result)
-    }
-
-    reader.readAsDataURL(file)
+    const previewUrl = URL.createObjectURL(file)
+    setImage(previewUrl)
   }
 
   async function handleSubmit(e) {
@@ -57,17 +56,16 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
         image,
       }
 
-      await handleUpdateItem(updatedItem)
+      await handleUpdateItem(updatedItem, imageFile)
     } else {
       const newItem = {
         title,
         price: Number(price),
         description,
         status,
-        image,
       }
 
-      await handleAddItem(newItem)
+      await handleAddItem(newItem, imageFile)
     }
 
     setTitle('')
@@ -75,6 +73,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
     setDescription('')
     setStatus('draft')
     setImage('')
+    setImageFile(null)
   }
 
   return (
@@ -96,7 +95,10 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
 
             <button
               type="button"
-              onClick={() => setImage('')}
+              onClick={() => {
+                  setImage('')
+                  setImageFile(null)
+                }}
             >
               Remove Photo
             </button>
@@ -158,6 +160,8 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
             setPrice('')
             setDescription('')
             setStatus('draft')
+            setImage('')
+            setImageFile(null)
           }}
         >
           Cancel Edit

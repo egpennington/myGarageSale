@@ -3,14 +3,14 @@ import { Navigate, Routes, Route } from 'react-router-dom'
 // import { collection, getDocs } from 'firebase/firestore'
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc,} from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
+import { auth, db, storage } from './firebase/firebase'
+import { getDownloadURL, ref, uploadBytes, } from 'firebase/storage'
 
 import Layout from './components/Layout'
 import Splash from './pages/Splash'
 import Store from './pages/Store'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
-
-import { auth, db } from './firebase/firebase'
 
 // import sampleItems from './data/sampleItems'
 
@@ -54,16 +54,35 @@ function App() {
     loadItems()
   }, [])
 
-  async function handleAddItem(newItem) {
+  async function handleAddItem(newItem, imageFile) {
     try {
+      let imageUrl = ''
+      let imagePath = ''
+
+      if (imageFile) {
+        imagePath = `items/${crypto.randomUUID()}-${imageFile.name}`
+
+        const imageRef = ref(storage, imagePath)
+
+        await uploadBytes(imageRef, imageFile)
+
+        imageUrl = await getDownloadURL(imageRef)
+      }
+
+      const itemData = {
+        ...newItem,
+        image: imageUrl,
+        imagePath,
+      }
+
       const docRef = await addDoc(
         collection(db, 'items'),
-        newItem
+        itemData
       )
 
       const itemWithId = {
         id: docRef.id,
-        ...newItem,
+        ...itemData,
       }
 
       setItems((currentItems) => [
@@ -153,24 +172,43 @@ function App() {
     }
   }
 
-  async function handleUpdateItem(updatedItem) {
+  async function handleUpdateItem(updatedItem, imageFile) {
     try {
       const itemRef = doc(db, 'items', updatedItem.id)
+
+      let imageUrl = updatedItem.image || ''
+      let imagePath = updatedItem.imagePath || ''
+
+      if (imageFile) {
+        imagePath = `items/${crypto.randomUUID()}-${imageFile.name}`
+
+        const imageRef = ref(storage, imagePath)
+
+        await uploadBytes(imageRef, imageFile)
+
+        imageUrl = await getDownloadURL(imageRef)
+      }
 
       const itemData = {
         title: updatedItem.title,
         price: updatedItem.price,
         description: updatedItem.description,
         status: updatedItem.status,
-        image: updatedItem.image,
+        image: imageUrl,
+        imagePath,
       }
 
       await updateDoc(itemRef, itemData)
 
+      const savedItem = {
+        ...updatedItem,
+        ...itemData,
+      }
+
       setItems((currentItems) =>
         currentItems.map((item) =>
           item.id === updatedItem.id
-            ? updatedItem
+            ? savedItem
             : item
         )
       )

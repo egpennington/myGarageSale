@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Routes, Route } from 'react-router-dom'
-// import { collection, getDocs } from 'firebase/firestore'
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc,} from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth, db, storage } from './firebase/firebase'
-import { getDownloadURL, ref, uploadBytes, } from 'firebase/storage'
+import { deleteObject, getDownloadURL, ref, uploadBytes, } from 'firebase/storage'
 
 import Layout from './components/Layout'
 import Splash from './pages/Splash'
@@ -12,10 +11,7 @@ import Store from './pages/Store'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
 
-// import sampleItems from './data/sampleItems'
-
 function App() {
-  // const [items, setItems] = useState(sampleItems)
   const [items, setItems] = useState([])
   const [editingItem, setEditingItem] = useState(null)
   const [user, setUser] = useState(null)
@@ -97,6 +93,17 @@ function App() {
 
   async function handleDelete(id) {
     try {
+      const currentItem = items.find((item) => item.id === id)
+
+      if (!currentItem) {
+        return
+      }
+
+      if (currentItem.imagePath) {
+        const imageRef = ref(storage, currentItem.imagePath)
+        await deleteObject(imageRef)
+      }
+
       await deleteDoc(doc(db, 'items', id))
 
       setItems((currentItems) =>
@@ -180,6 +187,11 @@ function App() {
       let imagePath = updatedItem.imagePath || ''
 
       if (imageFile) {
+        if (updatedItem.imagePath) {
+          const oldImageRef = ref(storage, updatedItem.imagePath)
+          await deleteObject(oldImageRef)
+        }
+        
         imagePath = `items/${crypto.randomUUID()}-${imageFile.name}`
 
         const imageRef = ref(storage, imagePath)

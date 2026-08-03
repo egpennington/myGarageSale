@@ -22,7 +22,15 @@ function AdminItem({ item, handleDelete, handleTogglePublish, handleToggleSold, 
         </button>
         <button
           className="danger-button"
-          onClick={() => handleDelete(item.id)}
+          onClick={() => {
+            const confirmed = window.confirm(
+              `Delete "${item.title}"? This cannot be undone.`
+            )
+
+            if (confirmed) {
+              handleDelete(item.id)
+            }
+          }}
         >
           Delete
         </button>

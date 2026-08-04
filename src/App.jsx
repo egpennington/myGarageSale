@@ -10,6 +10,7 @@ import Splash from './pages/Splash'
 import Store from './pages/Store'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
+import ItemDetails from './pages/ItemDetails'
 
 function App() {
   const [items, setItems] = useState([])
@@ -240,6 +241,11 @@ function App() {
         <Route
           path="/store"
           element={<Store items={items} />}
+        />
+
+        <Route
+          path="/store/:itemId"
+          element={<ItemDetails items={items} />}
         />
 
         <Route

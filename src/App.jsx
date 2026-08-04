@@ -17,6 +17,7 @@ function App() {
   const [editingItem, setEditingItem] = useState(null)
   const [user, setUser] = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
+  const [itemsLoading, setItemsLoading] = useState(true)
 
   // watch auth
   useEffect(() => {
@@ -45,6 +46,8 @@ function App() {
         setItems(firestoreItems)
       } catch (error) {
         console.error('Error loading items:', error)
+      } finally {
+        setItemsLoading(false)
       }
     }
 
@@ -245,7 +248,10 @@ function App() {
 
         <Route
           path="/store/:itemId"
-          element={<ItemDetails items={items} />}
+          element={
+            <ItemDetails items={items} 
+            itemsLoading={itemsLoading}/>
+          }
         />
 
         <Route

@@ -1,10 +1,18 @@
 import { Link, useParams } from 'react-router-dom'
 import { formatCurrency } from '../utils/formatCurrency'
 
-function ItemDetails({ items }) {
+function ItemDetails({ items, itemsLoading }) {
   const { itemId } = useParams()
 
   const item = items.find((item) => item.id === itemId)
+
+  if (itemsLoading) {
+    return (
+      <section className="item-details">
+        <p>Loading listing...</p>
+      </section>
+    )
+  }
 
   if (!item) {
     return (

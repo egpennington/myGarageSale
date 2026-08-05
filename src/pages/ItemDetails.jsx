@@ -2,47 +2,17 @@ import { Link, useParams } from 'react-router-dom'
 import { formatCurrency } from '../utils/formatCurrency'
 
 function ItemDetails({ items, itemsLoading }) {
-  const sellerName = 'Emmett'
-  const sellerEmail = 'egpennington@hotmail.com'
   const { itemId } = useParams()
 
-  // Item lookup
   const item = items.find((item) => item.id === itemId)
 
-  // Contact seller
-  const listingUrl =
-  `https://mygaragesaleapp.netlify.app/store/${itemId}`
-
-  const emailSubject = encodeURIComponent(
-    `Interested in: ${item.title}`
-  )
-
-  const emailBody = encodeURIComponent(
-  `Hi ${sellerName},
-
-  I'm interested in your myGarageSale listing.
-
-  Item:
-  ${item.title} ${formatCurrency(item.price)}
-
-  Listing:
-  ${listingUrl}
-
-  Is this item still available?
-
-  Thank you!`
-  )
-
-  const contactLink =
-    `mailto:${sellerEmail}?subject=${emailSubject}&body=${emailBody}`
-
-    if (itemsLoading) {
-      return (
-        <section className="item-details">
-          <p>Loading listing...</p>
-        </section>
-      )
-    }
+  if (itemsLoading) {
+    return (
+      <section className="item-details">
+        <p>Loading listing...</p>
+      </section>
+    )
+  }
 
   if (!item) {
     return (
@@ -50,12 +20,40 @@ function ItemDetails({ items, itemsLoading }) {
         <h1>Listing not found</h1>
         <p>This item may have been removed.</p>
 
-        <Link to="/store">
-          Back to Store
+        <Link to="/store" className="back-link">
+          <i className="fa-solid fa-arrow-left"></i> Back to Store
         </Link>
       </section>
     )
   }
+
+  const sellerName = 'Emmett'
+  const sellerEmail = 'egpennington@hotmail.com'
+
+  const listingUrl =
+    `https://mygaragesaleapp.netlify.app/store/${itemId}`
+
+  const emailSubject = encodeURIComponent(
+    `Interested in: ${item.title}`
+  )
+
+  const emailBody = encodeURIComponent(
+`Hi ${sellerName},
+
+I'm interested in your myGarageSale listing for:
+
+${item.title} (${formatCurrency(item.price)})
+
+Listing:
+${listingUrl}
+
+Is it still available?
+
+Thank you!`
+  )
+
+  const contactLink =
+    `mailto:${sellerEmail}?subject=${emailSubject}&body=${emailBody}`
 
   return (
     <section className="item-details">

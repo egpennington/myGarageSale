@@ -1,3 +1,5 @@
+import appConfig from "../config/appConfig";
+
 function Splash() {
     return (
         <section className="hero">
@@ -8,7 +10,9 @@ function Splash() {
 
                 <p className="hero__description">
                 Browse items from our garage sale or manage available listings.
+                v{appConfig.version}
                 </p>
+
             </div>
         </section>
     )

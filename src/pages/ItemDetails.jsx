@@ -2,17 +2,47 @@ import { Link, useParams } from 'react-router-dom'
 import { formatCurrency } from '../utils/formatCurrency'
 
 function ItemDetails({ items, itemsLoading }) {
+  const sellerName = 'Emmett'
+  const sellerEmail = 'egpennington@hotmail.com'
   const { itemId } = useParams()
 
+  // Item lookup
   const item = items.find((item) => item.id === itemId)
 
-  if (itemsLoading) {
-    return (
-      <section className="item-details">
-        <p>Loading listing...</p>
-      </section>
-    )
-  }
+  // Contact seller
+  const listingUrl =
+  `https://mygaragesaleapp.netlify.app/store/${itemId}`
+
+  const emailSubject = encodeURIComponent(
+    `Interested in: ${item.title}`
+  )
+
+  const emailBody = encodeURIComponent(
+  `Hi ${sellerName},
+
+  I'm interested in your myGarageSale listing.
+
+  Item:
+  ${item.title} ${formatCurrency(item.price)}
+
+  Listing:
+  ${listingUrl}
+
+  Is this item still available?
+
+  Thank you!`
+  )
+
+  const contactLink =
+    `mailto:${sellerEmail}?subject=${emailSubject}&body=${emailBody}`
+
+    if (itemsLoading) {
+      return (
+        <section className="item-details">
+          <p>Loading listing...</p>
+        </section>
+      )
+    }
 
   if (!item) {
     return (
@@ -56,9 +86,13 @@ function ItemDetails({ items, itemsLoading }) {
           <p>{item.description}</p>
 
           {item.status !== 'sold' && (
-            <button type="button">
+            <a
+              href={contactLink}
+              className="contact-button"
+            >
+              <i className="fa-solid fa-envelope"></i>
               Contact Seller
-            </button>
+            </a>
           )}
         </div>
       </div>

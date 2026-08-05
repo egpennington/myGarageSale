@@ -18,7 +18,7 @@ function ItemDetails({ items, itemsLoading }) {
     return (
       <section className="item-details">
         <h1>Listing not found</h1>
-        <p>This item may have been removed or is still loading.</p>
+        <p>This item may have been removed.</p>
 
         <Link to="/store">
           Back to Store

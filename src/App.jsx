@@ -249,8 +249,10 @@ function App() {
         <Route
           path="/store/:itemId"
           element={
-            <ItemDetails items={items} 
-            itemsLoading={itemsLoading}/>
+            <ItemDetails 
+            items={items} 
+            itemsLoading={itemsLoading}
+            />
           }
         />
 

@@ -210,6 +210,7 @@ function App() {
         price: updatedItem.price,
         description: updatedItem.description,
         status: updatedItem.status,
+        category: updatedItem.category,
         image: imageUrl,
         imagePath,
       }

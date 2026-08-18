@@ -8,6 +8,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
   const [status, setStatus] = useState('draft')
   const [image, setImage] = useState('')
   const [imageFile, setImageFile] = useState(null)
+  const [category, setCategory] = useState('other')
 
   useEffect(() => {
     if (editingItem) {
@@ -17,6 +18,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
       setStatus(editingItem.status)
       setImage(editingItem.image || '')
       setImageFile(null)
+      setCategory(editingItem.category || 'other')
     }
   }, [editingItem])
 
@@ -53,6 +55,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
         price: Number(price),
         description,
         status,
+        category,
         image,
       }
 
@@ -63,6 +66,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
         price: Number(price),
         description,
         status,
+        category,
       }
 
       await handleAddItem(newItem, imageFile)
@@ -72,6 +76,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
     setPrice('')
     setDescription('')
     setStatus('draft')
+    setCategory('other')
     setImage('')
     setImageFile(null)
   }
@@ -133,6 +138,22 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+      </label>
+
+      <label>
+        Cagegory
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}  
+        >
+          <option value ="art">Art</option>
+          <option value="books">Books</option>
+          <option value="electronics">Electronics</option>
+          <option value="furniture">Furniture</option>
+          <option value="tools">Tools</option>
+          <option value="dvd">DVD</option>
+          <option value="other">Other</option>          
+        </select>
       </label>
 
       <label>

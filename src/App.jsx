@@ -256,6 +256,19 @@ function App() {
     }
   }
 
+  async function handleUpdateSettings(updatedSettings) {
+    try {
+      const settingsRef = doc(db, 'settings', 'site')
+
+      await updateDoc(settingsRef, updatedSettings)
+
+      setSettings(updatedSettings)
+    } catch (error) {
+      console.error('Error updating settings:', error)
+      alert('Seller settings could not be updated.')
+    }
+  }
+
   return (
     <Layout user={user}>
       <Routes>
@@ -298,6 +311,8 @@ function App() {
                 editingItem={editingItem}
                 setEditingItem={setEditingItem}
                 handleUpdateItem={handleUpdateItem}
+                settings={settings}
+                handleUpdateSettings={handleUpdateSettings}
               />
             ) : (
               <Navigate to="/login" replace />

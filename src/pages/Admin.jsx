@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import AdminItem from '../components/AdminItem'
 import ItemForm from '../components/ItemForm'
 import appConfig from '../config/appConfig'
+import SellerSettings from '../components/SellerSettings'
 
 function Admin({
   items,
@@ -13,6 +14,8 @@ function Admin({
   editingItem,
   setEditingItem,
   handleUpdateItem,
+  settings,
+  handleUpdateSettings,
 }) {
   const formRef = useRef(null)
 
@@ -29,6 +32,11 @@ function Admin({
     <section>
       <h1>Admin Page</h1>
       <p>Manage your garage sale listings. Build v{appConfig.version}</p>
+
+      <SellerSettings
+        settings={settings}
+        handleUpdateSettings={handleUpdateSettings}
+      />
 
       <div ref={formRef}>
         <ItemForm

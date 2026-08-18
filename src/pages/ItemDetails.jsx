@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { formatCurrency } from '../utils/formatCurrency'
 
-function ItemDetails({ items, itemsLoading }) {
+function ItemDetails({ items, itemsLoading, settings }) {
   const { itemId } = useParams()
 
   const item = items.find((item) => item.id === itemId)
@@ -27,8 +27,16 @@ function ItemDetails({ items, itemsLoading }) {
     )
   }
 
-  const sellerName = 'Emmett'
-  const sellerEmail = 'egpennington@hotmail.com'
+  if (!settings) {
+    return (
+      <section className="item-details">
+        <p>Loading seller information...</p>
+      </section>
+    )
+  }
+
+  const sellerName = settings.sellerName
+  const sellerEmail = settings.sellerEmail
 
   const listingUrl =
     `https://mygaragesaleapp.netlify.app/store/${itemId}`

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Routes, Route } from 'react-router-dom'
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc,} from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc,} from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth, db, storage } from './firebase/firebase'
 import { deleteObject, getDownloadURL, ref, uploadBytes, } from 'firebase/storage'
@@ -18,6 +18,7 @@ function App() {
   const [user, setUser] = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
   const [itemsLoading, setItemsLoading] = useState(true)
+  const [settings, setSettings] = useState(null)
 
   // watch auth
   useEffect(() => {
@@ -52,6 +53,24 @@ function App() {
     }
 
     loadItems()
+  }, [])
+
+  // gets seller info
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const settingsRef = doc(db, 'settings', 'site')
+        const settingsSnapshot = await getDoc(settingsRef)
+
+        if (settingsSnapshot.exists()) {
+          setSettings(settingsSnapshot.data())
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error)
+      }
+    }
+
+    loadSettings()
   }, [])
 
   async function handleAddItem(newItem, imageFile) {
@@ -251,8 +270,9 @@ function App() {
           path="/store/:itemId"
           element={
             <ItemDetails 
-            items={items} 
-            itemsLoading={itemsLoading}
+              items={items} 
+              itemsLoading={itemsLoading}
+              settings={settings}
             />
           }
         />

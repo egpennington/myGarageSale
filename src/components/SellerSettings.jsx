@@ -6,8 +6,9 @@ function SellerSettings({ settings, handleUpdateSettings }) {
   const [pickupCity, setPickupCity] = useState('')
   const [venmo, setVenmo] = useState('')
   const [paypal, setPaypal] = useState('')
-  const [message, setMessage] = useState('')
+//   const [message, setMessage] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     if (settings) {
@@ -32,11 +33,17 @@ function SellerSettings({ settings, handleUpdateSettings }) {
 
     await handleUpdateSettings(updatedSettings)
 
-    setMessage('Seller settings saved.')
+    setSaved(true)
 
     setTimeout(() => {
-        setMessage('')
-    }, 3000)    
+    setSaved(false)
+    }, 2000)
+
+    // setMessage('Seller settings saved.')
+
+    // setTimeout(() => {
+    //     setMessage('')
+    // }, 3000)    
   }
 
   return (
@@ -60,11 +67,7 @@ function SellerSettings({ settings, handleUpdateSettings }) {
 
             {isOpen && (
             <>
-                {message && (
-                <p className="settings-success">
-                    {message}
-                </p>
-                )}
+                
 
                 <form onSubmit={handleSubmit}>
                 <label>
@@ -112,8 +115,10 @@ function SellerSettings({ settings, handleUpdateSettings }) {
                     />
                 </label>
 
-                <button type="submit">
-                    Save Seller Settings
+                <button 
+                    type="submit"
+                    className={saved ? 'settings-save-button saved' : 'settings-save-button'}>
+                    { saved ? 'Saved ✓' : 'Save Seller Settings'}
                 </button>
                 </form>
             </>

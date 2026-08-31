@@ -22,6 +22,7 @@
   --text: #222;
   --text-light: #666;
   --border: #ddd;
+  --important: #de1a1a;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   --radius: 8px;
   --max-width: 1200px;
@@ -711,4 +712,26 @@ footer {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+}
+
+.settings-save-button {
+  min-width: 190px;
+}
+
+.settings-save-button.saved {
+  background-color: #16a34a;
+  color: white;
+}
+
+/* Pick up city */
+.pickup-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.pickup-location i {
+  color: var(--important);
 }

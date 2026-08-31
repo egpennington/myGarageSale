@@ -91,6 +91,13 @@ Thank you!`
 
           <p>{item.description}</p>
 
+          {settings.pickupCity && (
+            <p className="pickup-location">
+              <i className="fa-solid fa-location-dot"></i>
+              Pickup in {settings.pickupCity}
+            </p>
+          )}
+
           {item.status !== 'sold' && (
             <a
               href={contactLink}

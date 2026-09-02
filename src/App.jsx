@@ -73,25 +73,47 @@ function App() {
     loadSettings()
   }, [])
 
-  async function handleAddItem(newItem, imageFile) {
-    try {
-      let imageUrl = ''
-      let imagePath = ''
+  async function handleAddItem( newItem, imageFiles, mainImageIndex ) {
+      try {
+        let uploadedImages = []
 
-      if (imageFile) {
-        imagePath = `items/${crypto.randomUUID()}-${imageFile.name}`
+        if (imageFiles.length > 0) {
+          uploadedImages = await Promise.all(
+            imageFiles.map(async (imageFile) => {
+              const imagePath =
+                `items/${crypto.randomUUID()}-${imageFile.name}`
 
-        const imageRef = ref(storage, imagePath)
+              const imageRef = ref(storage, imagePath)
 
-        await uploadBytes(imageRef, imageFile)
+              await uploadBytes(imageRef, imageFile)
 
-        imageUrl = await getDownloadURL(imageRef)
-      }
+              const imageUrl = await getDownloadURL(imageRef)
+
+              return {
+                url: imageUrl,
+                path: imagePath,
+              }
+            })
+          )
+        }
+
+      const mainImage = uploadedImages[mainImageIndex]
+
+      const otherImages = uploadedImages.filter(
+        (_, index) => index !== mainImageIndex
+      )
+
+      const orderedImages = mainImage
+        ? [mainImage, ...otherImages]
+        : []
+
+      console.log('selected main index:', mainImageIndex)
+      console.log('uploaded:', uploadedImages)
+      console.log('ordered:', orderedImages)
 
       const itemData = {
         ...newItem,
-        image: imageUrl,
-        imagePath,
+        images: orderedImages,
       }
 
       const docRef = await addDoc(
@@ -202,26 +224,49 @@ function App() {
     }
   }
 
-  async function handleUpdateItem(updatedItem, imageFile) {
+  async function handleUpdateItem(
+    updatedItem,
+    imageFiles,
+    mainImageIndex
+  ) {
     try {
       const itemRef = doc(db, 'items', updatedItem.id)
 
-      let imageUrl = updatedItem.image || ''
-      let imagePath = updatedItem.imagePath || ''
+      let savedImages = updatedItem.images || []
 
-      if (imageFile) {
-        if (updatedItem.imagePath) {
-          const oldImageRef = ref(storage, updatedItem.imagePath)
-          await deleteObject(oldImageRef)
-        }
-        
-        imagePath = `items/${crypto.randomUUID()}-${imageFile.name}`
+      if (imageFiles.length > 0) {
+        const uploadedImages = await Promise.all(
+          imageFiles.map(async (imageFile) => {
+            const imagePath =
+              `items/${crypto.randomUUID()}-${imageFile.name}`
 
-        const imageRef = ref(storage, imagePath)
+            const imageRef = ref(storage, imagePath)
 
-        await uploadBytes(imageRef, imageFile)
+            await uploadBytes(imageRef, imageFile)
 
-        imageUrl = await getDownloadURL(imageRef)
+            const imageUrl = await getDownloadURL(imageRef)
+
+            return {
+              url: imageUrl,
+              path: imagePath,
+            }
+          })
+        )
+
+        const mainImage = uploadedImages[mainImageIndex]
+
+        const otherImages = uploadedImages.filter(
+          (_, index) => index !== mainImageIndex
+        )
+
+        const orderedNewImages = mainImage
+          ? [mainImage, ...otherImages]
+          : uploadedImages
+
+        savedImages = [
+          ...savedImages,
+          ...orderedNewImages,
+        ]
       }
 
       const itemData = {
@@ -230,8 +275,7 @@ function App() {
         description: updatedItem.description,
         status: updatedItem.status,
         category: updatedItem.category,
-        image: imageUrl,
-        imagePath,
+        images: savedImages,
       }
 
       await updateDoc(itemRef, itemData)

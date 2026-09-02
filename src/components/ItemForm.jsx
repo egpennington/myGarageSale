@@ -7,8 +7,10 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState('draft')
   const [image, setImage] = useState('')
-  const [imageFile, setImageFile] = useState(null)
+  const [imageFiles, setImageFiles] = useState([])
   const [category, setCategory] = useState('other')
+  const [mainImageIndex, setMainImageIndex] = useState(0)
+  const [existingImages, setExistingImages] = useState([])
 
   useEffect(() => {
     if (editingItem) {
@@ -16,28 +18,50 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
       setPrice(editingItem.price)
       setDescription(editingItem.description)
       setStatus(editingItem.status)
-      setImage(editingItem.image || '')
-      setImageFile(null)
       setCategory(editingItem.category || 'other')
+
+      setExistingImages(editingItem.images || [])
+      setImageFiles([])
+      setImage(editingItem.image || '') 
+      setMainImageIndex(0)     
     }
   }, [editingItem])
 
   function handleImageChange(e) {
-    const file = e.target.files[0]
+    const files = Array.from(e.target.files)
 
-    if (!file) {
+    if (!files.length) {
       return
     }
 
-    if (!file.type.startsWith('image/')) {
-      alert('Please choose an image file.')
-      return
+    const validFiles = files.filter((file) =>
+      file.type.startsWith('image/')
+    )
+
+    if (validFiles.length !== files.length) {
+      alert('Only image files are allowed.')
     }
 
-    setImageFile(file)
+    setImageFiles(validFiles)
+    setMainImageIndex(0)
 
-    const previewUrl = URL.createObjectURL(file)
-    setImage(previewUrl)
+    console.log(validFiles)
+    console.log(validFiles.length)
+  }
+
+  function handleSetExistingMain(index) {
+    setExistingImages((currentImages) => {
+      const selectedImage = currentImages[index]
+
+      const otherImages = currentImages.filter(
+        (_, imageIndex) => imageIndex !== index
+      )
+
+      return [
+        selectedImage,
+        ...otherImages,
+      ]
+    })
   }
 
   async function handleSubmit(e) {
@@ -57,9 +81,10 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
         status,
         category,
         image,
+        images: existingImages,
       }
 
-      await handleUpdateItem(updatedItem, imageFile)
+      await handleUpdateItem(updatedItem, imageFiles, mainImageIndex)
     } else {
       const newItem = {
         title,
@@ -69,7 +94,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
         category,
       }
 
-      await handleAddItem(newItem, imageFile)
+      await handleAddItem(newItem, imageFiles, mainImageIndex)
     }
 
     setTitle('')
@@ -78,7 +103,8 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
     setStatus('draft')
     setCategory('other')
     setImage('')
-    setImageFile(null)
+    setImageFiles([])
+    setMainImageIndex(0)
   }
 
   return (
@@ -92,23 +118,71 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
         <input
           type="file"
           accept="image/*"
+          multiple
           onChange={handleImageChange}
         />
-        {image && (
-          <div className="image-preview">
-            <img src={image} alt="Listing preview" />
 
-            <button
-              type="button"
-              onClick={() => {
-                  setImage('')
-                  setImageFile(null)
-                }}
-            >
-              Remove Photo
-            </button>
+        {editingItem && existingImages.length > 0 && (
+          <div className="existing-images">
+            <h3>Current Photos</h3>
+
+            {existingImages.map((image, index) => (
+              <div
+                key={image.path || index}
+                className="image-preview__item"
+              >
+                <img
+                  src={image.url}
+                  alt={`Current listing photo ${index + 1}`}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => handleSetExistingMain(index)}
+                >
+                  {index === 0
+                    ? 'Main Photo ✓'
+                    : 'Set as Main'}
+                </button>
+              </div>
+            ))}
           </div>
         )}
+
+        {imageFiles.length > 0 && (
+  <div className="image-preview">
+    {imageFiles.map((file, index) => (
+        <div
+          key={`${file.name}-${index}`}
+          className="image-preview__item"
+        >
+          <img
+            src={URL.createObjectURL(file)}
+            alt={`Listing preview ${index + 1}`}
+          />
+
+          <button
+            type="button"
+            onClick={() => setMainImageIndex(index)}
+          >
+            {mainImageIndex === index
+              ? 'Main Photo ✓'
+              : 'Set as Main'}
+          </button>
+        </div>
+      ))}
+
+      <button
+        type="button"
+        onClick={() => {
+          setImageFiles([])
+          setMainImageIndex(0)
+        }}
+      >
+        Remove Photos
+      </button>
+    </div>
+  )}
       </label>
 
       <label>
@@ -141,7 +215,7 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
       </label>
 
       <label>
-        Cagegory
+        Category
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}  
@@ -182,7 +256,8 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
             setDescription('')
             setStatus('draft')
             setImage('')
-            setImageFile(null)
+            setImageFiles([])
+            setMainImageIndex(0)
           }}
         >
           Cancel Edit

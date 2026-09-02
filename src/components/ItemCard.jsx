@@ -2,6 +2,9 @@ import { formatCurrency } from '../utils/formatCurrency'
 import { Link } from 'react-router-dom'
 
 function ItemCard({ item }) {
+  const mainImage =
+    item.images?.[0]?.url || item.image
+
   return (
     <Link
       to={`/store/${item.id}`}
@@ -9,8 +12,8 @@ function ItemCard({ item }) {
     >
       <article className="item-card">
         <div className="item-card__image">
-          {item.image ? (
-            <img src={item.image} alt={item.title} />
+          {mainImage ? (
+            <img src={mainImage} alt={item.title} />
           ) : (
             <span>No photo</span>
           )}

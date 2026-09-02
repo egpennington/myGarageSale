@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 
-function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
+function ItemForm({ handleAddItem, editingItem, setEditingItem,
   handleUpdateItem, }) {
   const [title, setTitle] = useState('')
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState('draft')
-  const [image, setImage] = useState('')
+  
   const [imageFiles, setImageFiles] = useState([])
   const [category, setCategory] = useState('other')
   const [mainImageIndex, setMainImageIndex] = useState(0)
   const [existingImages, setExistingImages] = useState([])
+  const [removedImages, setRemovedImages] = useState([])
 
   useEffect(() => {
     if (editingItem) {
@@ -22,8 +23,8 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
 
       setExistingImages(editingItem.images || [])
       setImageFiles([])
-      setImage(editingItem.image || '') 
-      setMainImageIndex(0)     
+      setMainImageIndex(0)
+      setRemovedImages([])    
     }
   }, [editingItem])
 
@@ -44,9 +45,6 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
 
     setImageFiles(validFiles)
     setMainImageIndex(0)
-
-    console.log(validFiles)
-    console.log(validFiles.length)
   }
 
   function handleSetExistingMain(index) {
@@ -61,6 +59,21 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
         selectedImage,
         ...otherImages,
       ]
+    })
+  }
+
+  function handleRemoveExistingImage(index) {
+    setExistingImages((currentImages) => {
+      const imageToRemove = currentImages[index]
+
+      setRemovedImages((currentRemoved) => [
+        ...currentRemoved,
+        imageToRemove,
+      ])
+
+      return currentImages.filter(
+        (_, imageIndex) => imageIndex !== index
+      )
     })
   }
 
@@ -80,11 +93,10 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
         description,
         status,
         category,
-        image,
         images: existingImages,
       }
 
-      await handleUpdateItem(updatedItem, imageFiles, mainImageIndex)
+      await handleUpdateItem(updatedItem, imageFiles, mainImageIndex, removedImages)
     } else {
       const newItem = {
         title,
@@ -101,10 +113,11 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
     setPrice('')
     setDescription('')
     setStatus('draft')
-    setCategory('other')
-    setImage('')
+    setCategory('other')    
     setImageFiles([])
     setMainImageIndex(0)
+    setExistingImages([])
+    setRemovedImages([])
   }
 
   return (
@@ -143,6 +156,14 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
                   {index === 0
                     ? 'Main Photo ✓'
                     : 'Set as Main'}
+                </button>
+
+                <button
+                  type="button"
+                  className="danger-button"
+                  onClick={() => handleRemoveExistingImage(index)}
+                >
+                  Remove
                 </button>
               </div>
             ))}
@@ -255,9 +276,11 @@ function ItemForm({ setItems, handleAddItem, editingItem, setEditingItem,
             setPrice('')
             setDescription('')
             setStatus('draft')
-            setImage('')
+            setCategory('other')
             setImageFiles([])
             setMainImageIndex(0)
+            setExistingImages([])
+            setRemovedImages([])
           }}
         >
           Cancel Edit

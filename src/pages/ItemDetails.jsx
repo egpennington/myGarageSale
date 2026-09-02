@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { formatCurrency } from '../utils/formatCurrency'
 
 function ItemDetails({ items, itemsLoading, settings }) {
   const { itemId } = useParams()
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
   const item = items.find((item) => item.id === itemId)
 
@@ -34,6 +36,9 @@ function ItemDetails({ items, itemsLoading, settings }) {
       </section>
     )
   }
+
+  const images = item.images || []
+  const selectedImage = images[selectedImageIndex]
 
   const sellerName = settings.sellerName
   const sellerEmail = settings.sellerEmail
@@ -70,11 +75,38 @@ Thank you!`
       </Link>
 
       <div className="item-details__layout">
-        <div className="item-details__image">
-          {item.image ? (
-            <img src={item.image} alt={item.title} />
-          ) : (
-            <span>No photo</span>
+        <div className="item-details__gallery">
+          <div className="item-details__image">
+            {selectedImage ? (
+              <img
+                src={selectedImage.url}
+                alt={item.title}
+              />
+            ) : (
+              <span>No photo</span>
+            )}
+          </div>
+
+          {images.length > 1 && (
+            <div className="item-thumbnails">
+              {images.map((image, index) => (
+                <button
+                  key={image.path || index}
+                  type="button"
+                  className={
+                    selectedImageIndex === index
+                      ? 'item-thumbnail active'
+                      : 'item-thumbnail'
+                  }
+                  onClick={() => setSelectedImageIndex(index)}
+                >
+                  <img
+                    src={image.url}
+                    alt={`${item.title} photo ${index + 1}`}
+                  />
+                </button>
+              ))}
+            </div>
           )}
         </div>
 

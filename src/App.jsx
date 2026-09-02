@@ -107,10 +107,6 @@ function App() {
         ? [mainImage, ...otherImages]
         : []
 
-      console.log('selected main index:', mainImageIndex)
-      console.log('uploaded:', uploadedImages)
-      console.log('ordered:', orderedImages)
-
       const itemData = {
         ...newItem,
         images: orderedImages,
@@ -144,9 +140,15 @@ function App() {
         return
       }
 
-      if (currentItem.imagePath) {
-        const imageRef = ref(storage, currentItem.imagePath)
-        await deleteObject(imageRef)
+      if (currentItem.images?.length > 0) {
+        await Promise.all(
+          currentItem.images.map(async (image) => {
+            if (image.path) {
+              const imageRef = ref(storage, image.path)
+              await deleteObject(imageRef)
+            }
+          })
+        )
       }
 
       await deleteDoc(doc(db, 'items', id))
@@ -224,10 +226,7 @@ function App() {
     }
   }
 
-  async function handleUpdateItem(
-    updatedItem,
-    imageFiles,
-    mainImageIndex
+  async function handleUpdateItem( updatedItem, imageFiles, mainImageIndex, removedImages
   ) {
     try {
       const itemRef = doc(db, 'items', updatedItem.id)
@@ -279,6 +278,30 @@ function App() {
       }
 
       await updateDoc(itemRef, itemData)
+
+      if (removedImages.length > 0) {
+        await Promise.all(
+          removedImages.map(async (image) => {
+            if (!image.path) {
+              return
+            }
+
+            try {
+              const imageRef = ref(storage, image.path)
+              await deleteObject(imageRef)
+            } catch (error) {
+              if (error.code !== 'storage/object-not-found') {
+                throw error
+              }
+
+              console.warn(
+                'Image already missing from Storage:',
+                image.path
+              )
+            }
+          })
+        )
+      }
 
       const savedItem = {
         ...updatedItem,

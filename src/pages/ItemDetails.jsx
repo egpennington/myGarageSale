@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { formatCurrency } from '../utils/formatCurrency'
+import PayPalCheckout from '../components/PaypalCheckout'
 
 function ItemDetails({ items, itemsLoading, settings }) {
   const { itemId } = useParams()
@@ -140,6 +141,8 @@ Thank you!`
             </a>
           )}
         </div>
+
+        <PayPalCheckout />
       </div>
     </section>
   )

@@ -1,3 +1,15 @@
+import { initializeApp, getApps, cert } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
+import serviceAccount from '../../firebase-service-account.json' with { type: 'json' }
+
+if (!getApps().length) {
+  initializeApp({
+    credential: cert(serviceAccount),
+  })
+}
+
+const db = getFirestore()
+
 async function getPayPalAccessToken() {
   const clientId = process.env.PAYPAL_CLIENT_ID
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET
@@ -26,9 +38,47 @@ async function getPayPalAccessToken() {
   return data.access_token
 }
 
+// item id = 5UBGqA2Te1rVdCvutETY
+
 export default async (request) => {
   const body = await request.json()
   const itemId = body.itemId
+
+  const itemRef = db.collection('items').doc(itemId)
+  const itemDoc = await itemRef.get()
+
+  if (!itemDoc.exists) {
+    return new Response(
+      JSON.stringify({
+        error: 'Item not found',
+      }),
+      {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+
+  const item = itemDoc.data()
+  const price = Number(item.price)
+
+  // Guard it
+  if (!Number.isFinite(price) || price <= 0) {
+    return new Response(
+      JSON.stringify({
+        error: 'Invalid item price',
+      }),
+      {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+  const paypalPrice = price.toFixed(2)
 
   const accessToken = await getPayPalAccessToken()
   const baseUrl = process.env.PAYPAL_BASE_URL 
@@ -50,7 +100,7 @@ export default async (request) => {
           {
             amount: {
               currency_code: 'USD',
-              value: '1.00',
+              value: paypalPrice,
             },
           },
         ],
@@ -63,8 +113,11 @@ export default async (request) => {
   return new Response(
     JSON.stringify({
       itemId,
+      itemTitle: item.title,
+      itemPrice: item.price,
       orderStatus: orderResponse.status,
       orderId: orderData.id,
+      paypalPrice
     }),
     
     {

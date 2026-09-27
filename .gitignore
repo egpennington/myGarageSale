@@ -25,5 +25,8 @@ dist-ssr
 *.sln
 *.sw?
 
+# Firebase
+firebase-service-account.json
+
 # Local Netlify folder
 .netlify

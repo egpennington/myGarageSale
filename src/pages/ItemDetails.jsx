@@ -142,7 +142,7 @@ Thank you!`
           )}
         </div>
 
-        <PayPalCheckout />
+        <PayPalCheckout itemId={item.id} />
       </div>
     </section>
   )

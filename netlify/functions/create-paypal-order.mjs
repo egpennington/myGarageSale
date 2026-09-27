@@ -41,6 +41,18 @@ async function getPayPalAccessToken() {
 // item id = 5UBGqA2Te1rVdCvutETY
 
 export default async (request) => {
+
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': 'http://localhost:5173',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+    })
+  }
+
   const body = await request.json()
   const itemId = body.itemId
 
@@ -123,6 +135,7 @@ export default async (request) => {
     {
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': 'http://localhost:5173',
       },
     }
   )

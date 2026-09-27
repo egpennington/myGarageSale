@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 
-function PayPalCheckout() {
+function PayPalCheckout( {itemId} ) {
+  console.log('PayPal item ID:', itemId)
+
   useEffect(() => {
     async function initializePayPal() {
       try {
@@ -36,7 +38,37 @@ function PayPalCheckout() {
     initializePayPal()
   }, [])
 
-  return null
+  async function createOrder() {
+    const response = await fetch(
+      'http://localhost:9999/.netlify/functions/create-paypal-order',
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+        body: JSON.stringify({
+          itemId,
+        }),
+      }
+    )
+
+    const data = await response.json()
+
+    console.log('Order created:', data)
+
+    return data.orderId
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={createOrder}
+    >
+      Test PayPal Order
+    </button>
+  )
 }
 
 export default PayPalCheckout

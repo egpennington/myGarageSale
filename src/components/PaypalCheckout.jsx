@@ -1,42 +1,78 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
-function PayPalCheckout( {itemId} ) {
-  console.log('PayPal item ID:', itemId)
+function PayPalCheckout({ itemId }) {
+  console.log('PayPal item ID:', itemId);
 
   useEffect(() => {
+    let paypalButton;
+    let handlePayPalClick;
+    let cancelled = false;
+
     async function initializePayPal() {
       try {
         const sdkInstance = await window.paypal.createInstance({
           clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
           components: ['paypal-payments'],
           pageType: 'product-details',
-        })
+        });
 
-        console.log(
-          'PayPal initialized:',
-          Boolean(sdkInstance)
-        )
+        console.log('PayPal initialized:', Boolean(sdkInstance));
 
-        const paymentMethods =
-            await sdkInstance.findEligibleMethods({
-                currencyCode: 'USD',
-            })
+        const paymentMethods = await sdkInstance.findEligibleMethods({
+          currencyCode: 'USD',
+        });
 
-            console.log(
-                'PayPal eligible:',
-                paymentMethods.isEligible('paypal')
-                )
+        console.log('PayPal eligible:', paymentMethods.isEligible('paypal'));
 
+        const paypalSession = sdkInstance.createPayPalOneTimePaymentSession({
+          onApprove: ({ orderId }) => {
+            console.log('PayPal approved:', orderId);
+          },
+
+          onCancel: () => {
+            console.log('PayPal cancelled');
+          },
+
+          onError: (error) => {
+            console.error('PayPal error:', error);
+          },
+        });
+
+        paypalButton = document.querySelector('paypal-button');
+
+        handlePayPalClick = async () => {
+          try {
+            const createOrderPromise = createOrder();
+
+            await paypalSession.start(
+              {
+                presentationMode: 'auto',
+              },
+              createOrderPromise,
+            );
+          } catch (error) {
+            console.error('PayPal payment start failed:', error);
+          }
+        };
+
+        if (cancelled) return;
+
+        paypalButton.addEventListener('click', handlePayPalClick);
       } catch (error) {
-        console.error(
-          'PayPal initialization failed:',
-          error
-        )
+        console.error('PayPal initialization failed:', error);
       }
     }
 
-    initializePayPal()
-  }, [])
+    initializePayPal();
+
+    return () => {
+      cancelled = true;
+
+      if (paypalButton && handlePayPalClick) {
+        paypalButton.removeEventListener('click', handlePayPalClick);
+      }
+    };
+  }, []);
 
   async function createOrder() {
     const response = await fetch(
@@ -51,24 +87,19 @@ function PayPalCheckout( {itemId} ) {
         body: JSON.stringify({
           itemId,
         }),
-      }
-    )
+      },
+    );
 
-    const data = await response.json()
+    const data = await response.json();
 
-    console.log('Order created:', data)
+    console.log('Order created:', data);
 
-    return data.orderId
+    return {
+      orderId: data.orderId,
+    };
   }
 
-  return (
-    <button
-      type="button"
-      onClick={createOrder}
-    >
-      Test PayPal Order
-    </button>
-  )
+  return <paypal-button type="pay"></paypal-button>;
 }
 
-export default PayPalCheckout
+export default PayPalCheckout;

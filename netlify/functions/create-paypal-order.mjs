@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 import serviceAccount from '../../firebase-service-account.json' with { type: 'json' }
+import { getPayPalAccessToken } from './paypal-utils.mjs'
 
 if (!getApps().length) {
   initializeApp({
@@ -9,34 +10,6 @@ if (!getApps().length) {
 }
 
 const db = getFirestore()
-
-async function getPayPalAccessToken() {
-  const clientId = process.env.PAYPAL_CLIENT_ID
-  const clientSecret = process.env.PAYPAL_CLIENT_SECRET
-  const baseUrl = process.env.PAYPAL_BASE_URL
-
-  const auth = Buffer.from(
-    `${clientId}:${clientSecret}`
-  ).toString('base64')
-
-  const response = await fetch(
-    `${baseUrl}/v1/oauth2/token`,
-    {
-      method: 'POST',
-
-      headers: {
-        Authorization: `Basic ${auth}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-
-      body: 'grant_type=client_credentials',
-    }
-  )
-
-  const data = await response.json()
-
-  return data.access_token
-}
 
 // item id = 5UBGqA2Te1rVdCvutETY
 

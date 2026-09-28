@@ -25,8 +25,27 @@ function PayPalCheckout({ itemId }) {
         console.log('PayPal eligible:', paymentMethods.isEligible('paypal'));
 
         const paypalSession = sdkInstance.createPayPalOneTimePaymentSession({
-          onApprove: ({ orderId }) => {
+          onApprove: async ({ orderId }) => {
             console.log('PayPal approved:', orderId);
+
+            const response = await fetch(
+              'http://localhost:9999/.netlify/functions/capture-paypal-order',
+              {
+                method: 'POST',
+
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+
+                body: JSON.stringify({
+                  orderId,
+                }),
+              },
+            );
+
+            const data = await response.json();
+
+            console.log('Capture endpoint:', data);
           },
 
           onCancel: () => {

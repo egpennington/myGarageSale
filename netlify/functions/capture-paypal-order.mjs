@@ -31,6 +31,21 @@ export default async (request) => {
 
   const captureData = await captureResponse.json();
 
+  const purchaseUnit = captureData.purchase_units?.[0];
+  const capture = purchaseUnit?.payments?.captures?.[0];
+
+  const itemId = capture?.custom_id;
+  const capturedAmount = capture?.amount?.value;
+  const capturedCurrency = capture?.amount?.currency_code;
+  const captureStatus = capture?.status;
+
+  console.log('Verified PayPal capture:', {
+    itemId,
+    capturedAmount,
+    capturedCurrency,
+    captureStatus,
+  });
+
   return new Response(
     JSON.stringify({
       orderId,

@@ -1,5 +1,5 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import serviceAccount from '../../firebase-service-account.json' with { type: 'json' };
 import { getPayPalAccessToken } from './paypal-utils.mjs';
 
@@ -27,55 +27,109 @@ export default async (request) => {
   const itemId = body.itemId;
 
   const itemRef = db.collection('items').doc(itemId);
-  const itemDoc = await itemRef.get();
 
-  if (!itemDoc.exists) {
-    return new Response(
-      JSON.stringify({
-        error: 'Item not found',
-      }),
-      {
-        status: 404,
-        headers: {
-          'Content-Type': 'application/json',
+  const reservationMinutes = 15;
+
+  const reservedUntil = Timestamp.fromMillis(
+    Date.now() + reservationMinutes * 60 * 1000,
+  );
+
+  let paypalPrice;
+
+  try {
+    await db.runTransaction(async (transaction) => {
+      const itemDoc = await transaction.get(itemRef);
+
+      if (!itemDoc.exists) {
+        throw new Error('ITEM_NOT_FOUND');
+      }
+
+      const item = itemDoc.data();
+      const price = Number(item.price);
+
+      if (item.sold) {
+        throw new Error('ITEM_SOLD');
+      }
+
+      const existingReservation = item.reservedUntil;
+
+      if (existingReservation && existingReservation.toMillis() > Date.now()) {
+        throw new Error('ITEM_RESERVED');
+      }
+
+      if (!Number.isFinite(price) || price <= 0) {
+        throw new Error('INVALID_PRICE');
+      }
+
+      paypalPrice = price.toFixed(2);
+
+      transaction.update(itemRef, {
+        reservedUntil,
+      });
+    });
+  } catch (error) {
+    if (error.message === 'ITEM_NOT_FOUND') {
+      return new Response(
+        JSON.stringify({
+          error: 'Item not found',
+        }),
+        {
+          status: 404,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': 'http://localhost:5173',
+          },
         },
-      },
-    );
-  }
+      );
+    }
 
-  const item = itemDoc.data();
-  const price = Number(item.price);
-
-  if (item.sold) {
-    return new Response(
-      JSON.stringify({
-        error: 'Item is already sold',
-      }),
-      {
-        status: 409,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': 'http://localhost:5173',
+    if (error.message === 'ITEM_SOLD') {
+      return new Response(
+        JSON.stringify({
+          error: 'Item is already sold',
+        }),
+        {
+          status: 409,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': 'http://localhost:5173',
+          },
         },
-      },
-    );
-  }
+      );
+    }
 
-  // Guard it
-  if (!Number.isFinite(price) || price <= 0) {
-    return new Response(
-      JSON.stringify({
-        error: 'Invalid item price',
-      }),
-      {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
+    if (error.message === 'ITEM_RESERVED') {
+      return new Response(
+        JSON.stringify({
+          error: 'Item is temporarily reserved',
+        }),
+        {
+          status: 409,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': 'http://localhost:5173',
+          },
         },
-      },
-    );
+      );
+    }
+
+    if (error.message === 'INVALID_PRICE') {
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid item price',
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': 'http://localhost:5173',
+          },
+        },
+      );
+    }
+
+    throw error;
   }
-  const paypalPrice = price.toFixed(2);
 
   const accessToken = await getPayPalAccessToken();
   const baseUrl = process.env.PAYPAL_BASE_URL;
@@ -109,8 +163,6 @@ export default async (request) => {
   return new Response(
     JSON.stringify({
       itemId,
-      itemTitle: item.title,
-      itemPrice: item.price,
       orderStatus: orderResponse.status,
       orderId: orderData.id,
       paypalPrice,

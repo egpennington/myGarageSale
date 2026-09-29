@@ -46,6 +46,21 @@ export default async (request) => {
   const item = itemDoc.data();
   const price = Number(item.price);
 
+  if (item.sold) {
+    return new Response(
+      JSON.stringify({
+        error: 'Item is already sold',
+      }),
+      {
+        status: 409,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:5173',
+        },
+      },
+    );
+  }
+
   // Guard it
   if (!Number.isFinite(price) || price <= 0) {
     return new Response(

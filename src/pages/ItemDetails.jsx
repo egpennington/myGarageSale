@@ -1,20 +1,20 @@
-import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { formatCurrency } from '../utils/formatCurrency'
-import PayPalCheckout from '../components/PaypalCheckout'
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { formatCurrency } from '../utils/formatCurrency';
+import PayPalCheckout from '../components/PaypalCheckout';
 
 function ItemDetails({ items, itemsLoading, settings }) {
-  const { itemId } = useParams()
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const { itemId } = useParams();
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const item = items.find((item) => item.id === itemId)
+  const item = items.find((item) => item.id === itemId);
 
   if (itemsLoading) {
     return (
       <section className="item-details">
         <p>Loading listing...</p>
       </section>
-    )
+    );
   }
 
   if (!item) {
@@ -27,7 +27,7 @@ function ItemDetails({ items, itemsLoading, settings }) {
           <i className="fa-solid fa-arrow-left"></i> Back to Store
         </Link>
       </section>
-    )
+    );
   }
 
   if (!settings) {
@@ -35,24 +35,21 @@ function ItemDetails({ items, itemsLoading, settings }) {
       <section className="item-details">
         <p>Loading seller information...</p>
       </section>
-    )
+    );
   }
 
-  const images = item.images || []
-  const selectedImage = images[selectedImageIndex]
+  const images = item.images || [];
+  const selectedImage = images[selectedImageIndex];
 
-  const sellerName = settings.sellerName
-  const sellerEmail = settings.sellerEmail
+  const sellerName = settings.sellerName;
+  const sellerEmail = settings.sellerEmail;
 
-  const listingUrl =
-    `https://mygaragesaleapp.netlify.app/store/${itemId}`
+  const listingUrl = `https://mygaragesaleapp.netlify.app/store/${itemId}`;
 
-  const emailSubject = encodeURIComponent(
-    `Interested in: ${item.title}`
-  )
+  const emailSubject = encodeURIComponent(`Interested in: ${item.title}`);
 
   const emailBody = encodeURIComponent(
-`Hi ${sellerName},
+    `Hi ${sellerName},
 
 I'm interested in your myGarageSale listing for:
 
@@ -63,11 +60,10 @@ ${listingUrl}
 
 Is it still available?
 
-Thank you!`
-  )
+Thank you!`,
+  );
 
-  const contactLink =
-    `mailto:${sellerEmail}?subject=${emailSubject}&body=${emailBody}`
+  const contactLink = `mailto:${sellerEmail}?subject=${emailSubject}&body=${emailBody}`;
 
   return (
     <section className="item-details">
@@ -79,10 +75,7 @@ Thank you!`
         <div className="item-details__gallery">
           <div className="item-details__image">
             {selectedImage ? (
-              <img
-                src={selectedImage.url}
-                alt={item.title}
-              />
+              <img src={selectedImage.url} alt={item.title} />
             ) : (
               <span>No photo</span>
             )}
@@ -112,15 +105,21 @@ Thank you!`
         </div>
 
         <div className="item-details__content">
-          {item.status === 'sold' && (
-            <span className="sold-badge">Sold</span>
-          )}
-
           <h1>{item.title}</h1>
 
-          <strong className="item-details__price">
-            {formatCurrency(item.price)}
-          </strong>
+          <div className="item-details__status">
+            <strong
+              className={
+                item.sold
+                  ? 'item-details__price item-details__price--sold'
+                  : 'item-details__price'
+              }
+            >
+              {formatCurrency(item.price)}
+            </strong>
+
+            {item.sold && <span className="item-details__sold">SOLD</span>}
+          </div>
 
           <p>{item.description}</p>
 
@@ -131,21 +130,18 @@ Thank you!`
             </p>
           )}
 
-          {item.status !== 'sold' && (
-            <a
-              href={contactLink}
-              className="contact-button"
-            >
+          {!item.sold && (
+            <a href={contactLink} className="contact-button">
               <i className="fa-solid fa-envelope"></i>
               Contact Seller
             </a>
           )}
         </div>
 
-        <PayPalCheckout itemId={item.id} />
+        {!item.sold && <PayPalCheckout itemId={item.id} />}
       </div>
     </section>
-  )
+  );
 }
 
-export default ItemDetails
+export default ItemDetails;

@@ -1,4 +1,16 @@
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import serviceAccount from '../../firebase-service-account.json' with { type: 'json' };
+
 import { getPayPalAccessToken } from './paypal-utils.mjs';
+
+if (!getApps().length) {
+  initializeApp({
+    credential: cert(serviceAccount),
+  });
+}
+
+const db = getFirestore();
 
 export default async (request) => {
   if (request.method === 'OPTIONS') {
@@ -39,6 +51,58 @@ export default async (request) => {
   const capturedCurrency = capture?.amount?.currency_code;
   const captureStatus = capture?.status;
 
+  const itemRef = db.collection('items').doc(itemId);
+  const itemDoc = await itemRef.get();
+
+  if (!itemDoc.exists) {
+    console.error('Captured item not found:', itemId);
+  }
+
+  const item = itemDoc.data();
+  const itemPrice = Number(item.price);
+  const paidAmount = Number(capturedAmount);
+
+  const paymentIsValid =
+    captureStatus === 'COMPLETED' &&
+    capturedCurrency === 'USD' &&
+    Number.isFinite(itemPrice) &&
+    Number.isFinite(paidAmount) &&
+    itemPrice === paidAmount;
+
+  if (!paymentIsValid) {
+    return new Response(
+      JSON.stringify({
+        error: 'Payment verification failed',
+      }),
+      {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:5173',
+        },
+      },
+    );
+  }
+
+  // This Code can only reach here if paymentIsValid === true
+  await itemRef.update({
+    sold: true,
+  });
+
+  console.log('Payment verification:', {
+    itemPrice,
+    paidAmount,
+    capturedCurrency,
+    captureStatus,
+    paymentIsValid,
+  });
+
+  console.log('Matched Firestore item:', {
+    itemId,
+    title: item.title,
+    price: item.price,
+  });
+
   console.log('Verified PayPal capture:', {
     itemId,
     capturedAmount,
@@ -51,6 +115,7 @@ export default async (request) => {
       orderId,
       captureStatus: captureResponse.status,
       paypalStatus: captureData.status,
+      sold: true,
       captureData,
     }),
     {

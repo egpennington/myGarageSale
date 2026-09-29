@@ -196,6 +196,7 @@ button:hover {
 }
 
 .item-card__image {
+  position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   display: flex;
@@ -210,13 +211,40 @@ button:hover {
 }
 
 .sold-badge {
-  display: inline-block;
-  margin-top: 0.75rem;
-  padding: 0.25rem 0.5rem;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius);
+
+  background: #111;
+  color: white;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.item-details__status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.item-details__price--sold {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.item-details__sold {
+  padding: 0.35rem 0.65rem;
   border-radius: var(--radius);
   background: #111;
   color: white;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 /* Spacing */

@@ -87,6 +87,8 @@ export default async (request) => {
   // This Code can only reach here if paymentIsValid === true
   await itemRef.update({
     sold: true,
+    reservationId: null,
+    reservedUntil: null,
   });
 
   console.log('Payment verification:', {

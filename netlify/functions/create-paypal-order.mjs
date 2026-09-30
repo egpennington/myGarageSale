@@ -29,6 +29,7 @@ export default async (request) => {
   const itemRef = db.collection('items').doc(itemId);
 
   const reservationMinutes = 15;
+  const reservationId = crypto.randomUUID();
 
   const reservedUntil = Timestamp.fromMillis(
     Date.now() + reservationMinutes * 60 * 1000,
@@ -65,6 +66,7 @@ export default async (request) => {
 
       transaction.update(itemRef, {
         reservedUntil,
+        reservationId,
       });
     });
   } catch (error) {
@@ -158,7 +160,53 @@ export default async (request) => {
     }),
   });
 
-  const orderData = await orderResponse.json();
+  const orderText = await orderResponse.text();
+
+  let orderData = {};
+
+  if (orderText) {
+    try {
+      orderData = JSON.parse(orderText);
+    } catch {
+      orderData = {
+        rawResponse: orderText,
+      };
+    }
+  }
+
+  if (!orderResponse.ok) {
+    console.error('PayPal order creation failed:', orderData);
+
+    await db.runTransaction(async (transaction) => {
+      const itemDoc = await transaction.get(itemRef);
+
+      if (!itemDoc.exists) {
+        return;
+      }
+
+      const item = itemDoc.data();
+
+      if (item.reservationId === reservationId) {
+        transaction.update(itemRef, {
+          reservedUntil: null,
+          reservationId: null,
+        });
+      }
+    });
+
+    return new Response(
+      JSON.stringify({
+        error: 'Unable to create PayPal order',
+      }),
+      {
+        status: 502,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:5173',
+        },
+      },
+    );
+  }
 
   return new Response(
     JSON.stringify({
@@ -166,6 +214,7 @@ export default async (request) => {
       orderStatus: orderResponse.status,
       orderId: orderData.id,
       paypalPrice,
+      reservationId,
     }),
 
     {

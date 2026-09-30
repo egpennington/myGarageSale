@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 function PayPalCheckout({ itemId }) {
   console.log('PayPal item ID:', itemId);
+
+  const reservationIdRef = useRef(null);
 
   useEffect(() => {
     let paypalButton;
@@ -9,6 +11,10 @@ function PayPalCheckout({ itemId }) {
     let cancelled = false;
 
     async function initializePayPal() {
+      const sessionId = crypto.randomUUID();
+
+      console.log('Initializing PayPal session:', sessionId);
+
       try {
         const sdkInstance = await window.paypal.createInstance({
           clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
@@ -16,7 +22,7 @@ function PayPalCheckout({ itemId }) {
           pageType: 'product-details',
         });
 
-        console.log('PayPal initialized:', Boolean(sdkInstance));
+        console.log('PayPal initialized:', sessionId, Boolean(sdkInstance));
 
         const paymentMethods = await sdkInstance.findEligibleMethods({
           currencyCode: 'USD',
@@ -48,8 +54,42 @@ function PayPalCheckout({ itemId }) {
             console.log('Capture endpoint:', data);
           },
 
-          onCancel: () => {
-            console.log('PayPal cancelled');
+          onCancel: async ({ orderId }) => {
+            console.log('PayPal cancelled:', sessionId);
+
+            console.log('Reservation at cancel:', reservationIdRef.current);
+
+            const reservationId = reservationIdRef.current;
+
+            if (!reservationId) {
+              return;
+            }
+
+            try {
+              const response = await fetch(
+                'http://localhost:9999/.netlify/functions/release-paypal-reservation',
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    itemId,
+                    reservationId,
+                  }),
+                },
+              );
+
+              const data = await response.json();
+
+              console.log('Reservation release:', data);
+
+              if (data.released) {
+                reservationIdRef.current = null;
+              }
+            } catch (error) {
+              console.error('Reservation release failed:', error);
+            }
           },
 
           onError: (error) => {
@@ -111,11 +151,15 @@ function PayPalCheckout({ itemId }) {
 
     const data = await response.json();
 
+    if (!response.ok) {
+      throw new Error(data.error || 'Unable to create PayPal order');
+    }
+
+    reservationIdRef.current = data.reservationId;
+
     console.log('Order created:', data);
 
-    return {
-      orderId: data.orderId,
-    };
+    return { orderId: data.orderId };
   }
 
   return <paypal-button type="pay"></paypal-button>;

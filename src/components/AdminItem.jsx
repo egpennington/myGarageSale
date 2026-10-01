@@ -1,6 +1,12 @@
-import { formatCurrency } from '../utils/formatCurrency'
+import { formatCurrency } from '../utils/formatCurrency';
 
-function AdminItem({ item, handleDelete, handleTogglePublish, handleToggleSold,   handleEdit, }) {
+function AdminItem({
+  item,
+  handleDelete,
+  handleTogglePublish,
+  handleToggleSold,
+  handleEdit,
+}) {
   return (
     <article className="admin-item">
       <div>
@@ -11,24 +17,22 @@ function AdminItem({ item, handleDelete, handleTogglePublish, handleToggleSold, 
       </div>
 
       <div className="admin-actions">
-        <button onClick={() => handleEdit(item)}>
-          Edit
-        </button>
+        <button onClick={() => handleEdit(item)}>Edit</button>
         <button onClick={() => handleTogglePublish(item.id)}>
           {item.status === 'published' ? 'Unpublish' : 'Publish'}
         </button>
         <button onClick={() => handleToggleSold(item.id)}>
-          {item.status === 'sold' ? 'Mark Available' : 'Mark Sold'}
+          {item.sold ? 'Mark Available' : 'Mark Sold'}
         </button>
         <button
           className="danger-button"
           onClick={() => {
             const confirmed = window.confirm(
-              `Delete "${item.title}"? This cannot be undone.`
-            )
+              `Delete "${item.title}"? This cannot be undone.`,
+            );
 
             if (confirmed) {
-              handleDelete(item.id)
+              handleDelete(item.id);
             }
           }}
         >
@@ -36,7 +40,7 @@ function AdminItem({ item, handleDelete, handleTogglePublish, handleToggleSold, 
         </button>
       </div>
     </article>
-  )
+  );
 }
 
-export default AdminItem
+export default AdminItem;

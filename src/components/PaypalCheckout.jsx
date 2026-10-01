@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function PayPalCheckout({ itemId }) {
   console.log('PayPal item ID:', itemId);
 
   const reservationIdRef = useRef(null);
+  const [paymentComplete, setPaymentComplete] = useState(false);
 
   const functionsBaseUrl = import.meta.env.DEV ? 'http://localhost:9999' : '';
 
@@ -54,6 +55,10 @@ function PayPalCheckout({ itemId }) {
             const data = await response.json();
 
             console.log('Capture endpoint:', data);
+
+            if (data.paypalStatus === 'COMPLETED' && data.sold) {
+              setPaymentComplete(true);
+            }
           },
 
           onCancel: async ({ orderId }) => {
@@ -162,6 +167,15 @@ function PayPalCheckout({ itemId }) {
     console.log('Order created:', data);
 
     return { orderId: data.orderId };
+  }
+
+  if (paymentComplete) {
+    return (
+      <div className="payment-success">
+        <strong>Payment complete!</strong>
+        <p>This item is now sold. Thank you for your purchase.</p>
+      </div>
+    );
   }
 
   return <paypal-button type="pay"></paypal-button>;

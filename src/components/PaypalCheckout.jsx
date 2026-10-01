@@ -5,6 +5,8 @@ function PayPalCheckout({ itemId }) {
 
   const reservationIdRef = useRef(null);
 
+  const functionsBaseUrl = import.meta.env.DEV ? 'http://localhost:9999' : '';
+
   useEffect(() => {
     let paypalButton;
     let handlePayPalClick;
@@ -35,7 +37,7 @@ function PayPalCheckout({ itemId }) {
             console.log('PayPal approved:', orderId);
 
             const response = await fetch(
-              'http://localhost:9999/.netlify/functions/capture-paypal-order',
+              `${functionsBaseUrl}/.netlify/functions/capture-paypal-order`,
               {
                 method: 'POST',
 
@@ -67,7 +69,7 @@ function PayPalCheckout({ itemId }) {
 
             try {
               const response = await fetch(
-                'http://localhost:9999/.netlify/functions/release-paypal-reservation',
+                `${functionsBaseUrl}/.netlify/functions/release-paypal-reservation`,
                 {
                   method: 'POST',
                   headers: {
@@ -135,7 +137,7 @@ function PayPalCheckout({ itemId }) {
 
   async function createOrder() {
     const response = await fetch(
-      'http://localhost:9999/.netlify/functions/create-paypal-order',
+      `${functionsBaseUrl}/.netlify/functions/create-paypal-order`,
       {
         method: 'POST',
 

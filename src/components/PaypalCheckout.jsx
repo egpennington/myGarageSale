@@ -5,6 +5,7 @@ function PayPalCheckout({ itemId }) {
 
   const reservationIdRef = useRef(null);
   const [paymentComplete, setPaymentComplete] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
 
   const functionsBaseUrl = import.meta.env.DEV ? 'http://localhost:9999' : '';
 
@@ -141,6 +142,8 @@ function PayPalCheckout({ itemId }) {
   }, []);
 
   async function createOrder() {
+    setCheckoutError('');
+
     const response = await fetch(
       `${functionsBaseUrl}/.netlify/functions/create-paypal-order`,
       {
@@ -159,7 +162,23 @@ function PayPalCheckout({ itemId }) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || 'Unable to create PayPal order');
+      if (
+        response.status === 409 &&
+        data.error?.includes('temporarily reserved')
+      ) {
+        setCheckoutError(
+          'Someone is currently checking out with this item. Try again in a few minutes.',
+        );
+      } else if (
+        response.status === 409 &&
+        data.error?.includes('already sold')
+      ) {
+        setCheckoutError('Sorry, this item has already been sold.');
+      } else {
+        setCheckoutError('Checkout could not be started. Please try again.');
+      }
+
+      throw new Error(data.error || 'Could not create PayPal order');
     }
 
     reservationIdRef.current = data.reservationId;
@@ -178,7 +197,18 @@ function PayPalCheckout({ itemId }) {
     );
   }
 
-  return <paypal-button type="pay"></paypal-button>;
+  return (
+    <>
+      <paypal-button type="pay"></paypal-button>
+
+      {checkoutError && (
+        <div className="checkout-error">
+          <strong>Item temporarily reserved</strong>
+          <p>{checkoutError}</p>
+        </div>
+      )}
+    </>
+  );
 }
 
 export default PayPalCheckout;

@@ -213,6 +213,24 @@ export default async (request) => {
     );
   }
 
+  await db.runTransaction(async (transaction) => {
+    const itemDoc = await transaction.get(itemRef);
+
+    if (!itemDoc.exists) {
+      throw new Error('ITEM_NOT_FOUND');
+    }
+
+    const item = itemDoc.data();
+
+    if (item.reservationId !== reservationId) {
+      throw new Error('RESERVATION_MISMATCH');
+    }
+
+    transaction.update(itemRef, {
+      paypalOrderId: orderData.id,
+    });
+  });
+
   return new Response(
     JSON.stringify({
       itemId,

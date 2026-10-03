@@ -50,6 +50,7 @@ export default async (request) => {
     transaction.update(itemRef, {
       reservedUntil: null,
       reservationId: null,
+      paypalOrderId: null,
     });
 
     released = true;

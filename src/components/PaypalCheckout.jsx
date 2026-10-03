@@ -57,7 +57,25 @@ function PayPalCheckout({ itemId }) {
 
             console.log('Capture endpoint:', data);
 
+            if (!response.ok) {
+              if (
+                response.status === 409 &&
+                data.error?.includes('reservation has expired')
+              ) {
+                setCheckoutError(
+                  'Your checkout session expired. Please click PayPal to try again.',
+                );
+              } else {
+                setCheckoutError(
+                  'Your payment could not be completed. Please try again.',
+                );
+              }
+
+              return;
+            }
+
             if (data.paypalStatus === 'COMPLETED' && data.sold) {
+              setCheckoutError('');
               setPaymentComplete(true);
             }
           },
@@ -203,7 +221,7 @@ function PayPalCheckout({ itemId }) {
 
       {checkoutError && (
         <div className="checkout-error">
-          <strong>Item temporarily reserved</strong>
+          <strong>Checkout problem</strong>
           <p>{checkoutError}</p>
         </div>
       )}

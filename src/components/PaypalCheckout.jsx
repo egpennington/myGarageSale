@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-function PayPalCheckout({ itemId }) {
+function PayPalCheckout({ itemId, onItemSold }) {
   console.log('PayPal item ID:', itemId);
 
   const reservationIdRef = useRef(null);
@@ -77,6 +77,7 @@ function PayPalCheckout({ itemId }) {
             if (data.paypalStatus === 'COMPLETED' && data.sold) {
               setCheckoutError('');
               setPaymentComplete(true);
+              onItemSold(itemId);
             }
           },
 

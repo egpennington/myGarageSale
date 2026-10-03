@@ -33,6 +33,14 @@ function App() {
   const [itemsLoading, setItemsLoading] = useState(true);
   const [settings, setSettings] = useState(null);
 
+  function handleItemSold(itemId) {
+    setItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === itemId ? { ...item, sold: true } : item,
+      ),
+    );
+  }
+
   // watch auth
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -335,6 +343,7 @@ function App() {
               items={items}
               itemsLoading={itemsLoading}
               settings={settings}
+              handleItemSold={handleItemSold}
             />
           }
         />

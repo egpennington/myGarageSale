@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { formatCurrency } from '../utils/formatCurrency';
 import PayPalCheckout from '../components/PaypalCheckout';
 
-function ItemDetails({ items, itemsLoading, settings }) {
+function ItemDetails({ items, itemsLoading, settings, handleItemSold }) {
   const { itemId } = useParams();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
@@ -138,7 +138,9 @@ Thank you!`,
           )}
         </div>
 
-        {!item.sold && <PayPalCheckout itemId={item.id} />}
+        {!item.sold && (
+          <PayPalCheckout itemId={item.id} onItemSold={handleItemSold} />
+        )}
       </div>
     </section>
   );

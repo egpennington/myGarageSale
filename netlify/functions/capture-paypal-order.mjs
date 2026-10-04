@@ -158,6 +158,26 @@ export default async (request) => {
 
   const captureData = await captureResponse.json();
 
+  if (!captureResponse.ok) {
+    console.error('PayPal capture failed:', {
+      status: captureResponse.status,
+      data: captureData,
+    });
+
+    return new Response(
+      JSON.stringify({
+        error: 'PayPal payment could not be completed',
+      }),
+      {
+        status: 502,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:5173',
+        },
+      },
+    );
+  }
+
   const purchaseUnit = captureData.purchase_units?.[0];
   const capture = purchaseUnit?.payments?.captures?.[0];
 

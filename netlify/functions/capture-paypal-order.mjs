@@ -152,6 +152,7 @@ export default async (request) => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
+        'PayPal-Request-Id': `capture-${orderId}`,
       },
     },
   );

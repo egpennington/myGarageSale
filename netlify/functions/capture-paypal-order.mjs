@@ -252,35 +252,59 @@ export default async (request) => {
   }
 
   // This code can only reach here if paymentIsValid === true
+  try {
+    await db.runTransaction(async (transaction) => {
+      const currentItemDoc = await transaction.get(itemRef);
 
-  await db.runTransaction(async (transaction) => {
-    const currentItemDoc = await transaction.get(itemRef);
+      if (!currentItemDoc.exists) {
+        throw new Error('ITEM_NOT_FOUND');
+      }
 
-    if (!currentItemDoc.exists) {
-      throw new Error('ITEM_NOT_FOUND');
-    }
+      const currentItem = currentItemDoc.data();
 
-    const currentItem = currentItemDoc.data();
+      if (currentItem.sold) {
+        throw new Error('ITEM_ALREADY_SOLD');
+      }
 
-    if (currentItem.sold) {
-      throw new Error('ITEM_ALREADY_SOLD');
-    }
+      if (currentItem.paypalOrderId !== orderId) {
+        throw new Error('ORDER_MISMATCH');
+      }
 
-    if (currentItem.paypalOrderId !== orderId) {
-      throw new Error('ORDER_MISMATCH');
-    }
+      if (!currentItem.reservationId) {
+        throw new Error('RESERVATION_MISSING');
+      }
 
-    if (!currentItem.reservationId) {
-      throw new Error('RESERVATION_MISSING');
-    }
-
-    transaction.update(itemRef, {
-      sold: true,
-      reservationId: null,
-      reservedUntil: null,
-      paypalOrderId: null,
+      transaction.update(itemRef, {
+        sold: true,
+        reservationId: null,
+        reservedUntil: null,
+        paypalOrderId: null,
+      });
     });
-  });
+  } catch (error) {
+    console.error('Firestore update failed after PayPal capture:', {
+      orderId,
+      itemId,
+      captureId: capture?.id,
+      error: error.message,
+    });
+
+    return new Response(
+      JSON.stringify({
+        error: 'Payment completed, but the item status could not be updated',
+        paymentCaptured: true,
+        orderId,
+        captureId: capture?.id,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:5173',
+        },
+      },
+    );
+  }
 
   console.log('Payment verification:', {
     itemPrice,

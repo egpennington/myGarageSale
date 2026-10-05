@@ -58,7 +58,11 @@ function PayPalCheckout({ itemId, onItemSold }) {
             console.log('Capture endpoint:', data);
 
             if (!response.ok) {
-              if (
+              if (data.paymentCaptured) {
+                setCheckoutError(
+                  'Your payment was completed, but we had trouble updating the item. Please do not pay again. Contact the seller for assistance.',
+                );
+              } else if (
                 response.status === 409 &&
                 data.error?.includes('reservation has expired')
               ) {

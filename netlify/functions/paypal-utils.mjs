@@ -3,6 +3,15 @@ export async function getPayPalAccessToken() {
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
   const baseUrl = process.env.PAYPAL_BASE_URL;
 
+  console.log('PayPal server config:', {
+    baseUrl,
+    clientIdLoaded: Boolean(clientId),
+    clientIdLength: clientId?.length,
+    clientIdTail: clientId?.slice(-6),
+    clientSecretLoaded: Boolean(clientSecret),
+    clientSecretLength: clientSecret?.length,
+  });
+
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
   const response = await fetch(`${baseUrl}/v1/oauth2/token`, {

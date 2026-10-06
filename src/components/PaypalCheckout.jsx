@@ -20,6 +20,10 @@ function PayPalCheckout({ itemId, onItemSold }) {
       console.log('Initializing PayPal session:', sessionId);
 
       try {
+        console.log(
+          'PayPal Client ID loaded:',
+          Boolean(import.meta.env.VITE_PAYPAL_CLIENT_ID),
+        );
         const sdkInstance = await window.paypal.createInstance({
           clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
           components: ['paypal-payments'],
